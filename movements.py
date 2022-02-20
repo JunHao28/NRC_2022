@@ -1,6 +1,5 @@
 
 class Robot:
-
     forwardki = 1
     forwardkp = 1
     forwardkd = 1
@@ -38,10 +37,10 @@ class Robot:
         currentDegree = sensor1.angle()
         distanceIntegral = 0
         distanceDerivative = 0
-        distanceLast_error = 0
+        distanceLastError = 0
         gyroIntegral = 0
         gyroDerivative = 0
-        gyroLast_error = 0
+        gyroLastError = 0
         while degree < currentAngle:
             distanceError = degree + currentAngle - motor.motora.angle()
             distanceIntegral = distanceIntegral + distanceError
@@ -54,9 +53,25 @@ class Robot:
             gyroLastError = gyroError
             leftspeed = speed + (distanceDerivative * forwardkd) + (distanceError * forwardkp) + (distanceIntegral * forwardki)
             rightspeed = speed - (distanceDerivative * forwardkd) + (distanceError * forwardkp) + (distanceIntegral * forwardki)
+            Robot.move(CheckLimit.minimaximum(leftspeed*10), CheckLimit.minimaximum(rightspeed*10))
 
             
 
+class CheckLimit:
+    def maximum(number, maximum):
+        if number >= maximum:
+            return number
+        else:
+            return maximum
+    
+    def minimum(number, minimum):
+        if number >= minimum:
+            return number
+        else: 
+            return minimum
+
+    def minimaximum(number, minimum, maximum):
+        return CheckLimit.minimum(CheckLimit.maximum(number, maximum), minimum)
             
 
 class Motors:
