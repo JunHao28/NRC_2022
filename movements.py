@@ -53,7 +53,7 @@ class Robot:
             gyroLastError = gyroError
             leftspeed = speed + (distanceDerivative * forwardkd) + (distanceError * forwardkp) + (distanceIntegral * forwardki)
             rightspeed = speed - (distanceDerivative * forwardkd) + (distanceError * forwardkp) + (distanceIntegral * forwardki)
-            Robot.move(CheckLimit.minimaximum(leftspeed*10), CheckLimit.minimaximum(rightspeed*10))
+            Robot.move(CheckLimit.minimaximum(leftspeed*10, 100, 1000), CheckLimit.minimaximum(rightspeed*10, 100, 1000))
 
             
 
