@@ -40,7 +40,7 @@ class Robot:
         distanceLastError = 0
         gyroIntegral = 0
         gyroDerivative = 0
-        gyroLastError = 0 
+        gyroLastError = 0
         while degree < currentAngle:
             distanceError = degree + currentAngle - motor.motora.angle()
             distanceIntegral = distanceIntegral + distanceError
