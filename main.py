@@ -16,8 +16,7 @@ from section1 import section1
 
 # Create your objects here.
 ev3 = EV3Brick()
-robot = Robot(ev3, Motor(Port.B, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.C), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3), ColorSensor(Port.S3))
-
+robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3), ColorSensor(Port.S4))
 
 
 
@@ -35,17 +34,17 @@ robot = Robot(ev3, Motor(Port.B, positive_direction=Direction.COUNTERCLOCKWISE),
 #NOTE: reset arm position
 robot.resetRobot()
 # robot.pidturn(0, 90)
-# robot = section1(robot)
+robot = section1(robot)
 # print(robot)
 
-color = robot.gyroForwardTillSense(300, 0, 5, stopAfter=200)
-if color[0] >= 10 and color[1] <= 10 and color[2] <= 10:
-    robot.depositWater()
-else: 
-    print(color)
-    print()
-robot.stop()
-robot.pidmovegyrodegree(200, 700)
+# color = robot.gyroForwardTillSense(300, 0, 5, stopAfter=200)
+# if color[0] >= 10 and color[1] <= 10 and color[2] <= 10:
+#     robot.depositWater()
+# else: 
+#     print(color)
+#     print()
+# robot.stop()
+# robot.pidmovegyrodegree(200, 700)
 # robot.depositWater()
 # robot.stop()
-robot.beep()
+# robot.beep()

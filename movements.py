@@ -1,10 +1,10 @@
 import time
 from pybricks.parameters import Port, Stop, Direction, Button, Color
-# import enum
+from enum import Enum
 
 class Robot:
     forwardki = 0
-    forwardkp = 1
+    forwardkp = 1.1
     forwardkd = 0.2
     gyroki = 0
     gyrokp = 3  
@@ -110,7 +110,9 @@ class Robot:
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
-        while sum(self.sensorVal(sensorNo+1)) < rgb:
+        sensor = self.sensorVal(sensorNo+1)
+        while ((sum(sensor) <= rgb+50) and (sum(sensor) >= rgb-50))!= False:
+            print(sensor)
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
@@ -121,6 +123,7 @@ class Robot:
                 if currentAngle + stopAfter <= self.motorb.angle():
                     break
                     return None
+            sensor = self.sensorVal(sensorNo+1)
         self.stop()
         return self.sensorVal(sensorNo+1)
         
@@ -168,6 +171,6 @@ class BaseSpeed:
         self.leftBase = leftBase,
         self.rightBase = rightBase,
 
-# class StartingPos(enum.Enum):
-#     right = 1
-#     left = 2
+class StartingPos(Enum):
+    RIGHT = 1
+    LEFT = 2
