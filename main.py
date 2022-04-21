@@ -8,7 +8,10 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import time
 from movements import Robot
+
+#Program Files
 from section1 import section1
+from section2 import section2
 
 # Documentation:
 # https://pybricks.com/ev3-micropython/ev3devices.html
@@ -18,7 +21,10 @@ from section1 import section1
 ev3 = EV3Brick()
 robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3), ColorSensor(Port.S4))
 
-
+#NOTE: reset arm position
+robot.resetRobot()
+robot = section1(robot)
+robot = section2(robot)
 
 # Write your program here.
 # Motor(Port.D).run(10000)
@@ -31,11 +37,7 @@ robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COU
 # time.sleep(0.7)
 # Motor(Port.D).brake()
 
-#NOTE: reset arm position
-robot.resetRobot()
-# robot.pidturn(0, 90)
-robot = section1(robot)
-# print(robot)
+
 
 # color = robot.gyroForwardTillSense(300, 0, 5, stopAfter=200)
 # if color[0] >= 10 and color[1] <= 10 and color[2] <= 10:

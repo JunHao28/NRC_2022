@@ -1,17 +1,16 @@
 import time
 from pybricks.parameters import Port, Stop, Direction, Button, Color
-from enum import Enum
 
 class Robot:
     forwardki = 0
-    forwardkp = 1.1
-    forwardkd = 0.2
+    forwardkp = 2
+    forwardkd = 0
     gyroki = 0
-    gyrokp = 3  
+    gyrokp = 1
     gyrokd = 0
-    turnki = 0.0000
-    turnkp = 2
-    turnkd = 0.7
+    turnki = 0
+    turnkp = 3
+    turnkd = 0
 
     startingPos = None
     
@@ -49,12 +48,12 @@ class Robot:
         else:
             return sensors[sensorNo].rgb()
     
-    def pidturn(self, speed, degree, minimumSpeed=100):
+    def pidturn(self, speed, degree, minimumSpeed=30, oneWheel=0):
         currentAngle = self.sensor1.angle()
         integral = 0
         lastError = 0
-        while self.sensorVal(0) != degree:
-            error = self.sensor1.angle() - currentAngle - degree
+        while self.sensorVal(0) != (currentAngle + degree):
+            error = self.sensor1.angle() - (currentAngle + degree)
             integral = integral + error
             derivative = error - lastError
             lastError = error
@@ -63,46 +62,53 @@ class Robot:
                 changeSpeed += speed
             else:
                 changeSpeed -= speed
-            self.move(CheckLimit.minimaximum(-changeSpeed, minimumSpeed, 1000), CheckLimit.minimaximum(changeSpeed, minimumSpeed, 1000))
+            changeSpeed = CheckLimit.minimaximum(changeSpeed, minimumSpeed, 1200)
+            if (oneWheel == 0):
+                right = -changeSpeed
+                left = changeSpeed
+            elif (oneWheel == 1):
+                right = -changeSpeed
+                left = 0
+            elif (oneWheel == 2):
+                right = 0
+                left = changeSpeed
+            self.move(left, right)
         self.stop()
 
-    def pidmovedistance(self, degree, speed, minimumSpeed=200, move=True, currentAngle=0, last_error=0):
+    def pidmovedistance(self, degree, speed, minimumSpeed=200, move=True, currentAngle=0, last_error=0, derivative=0):
         if move:
             currentAngle = self.motorb.angle()
-            last_error = 0
         while degree != self.motorb.angle() - currentAngle:
             error = degree - (self.motorb.angle()-currentAngle)
             derivative = error - last_error
             speed = (derivative * self.forwardkd) + (error * self.forwardkp)
             last_error = error
+            speed = CheckLimit.minimaximum(speed, minimumSpeed, 1500)
             if move:
-                speed = CheckLimit.minimaximum(speed, minimumSpeed, 1500)
                 self.move(speed, speed)
             else:
-                return [speed, last_error]
+                return [speed, last_error, derivative]
     
-    def pidmovegyrodegree(self, degree, speed, minimumSpeed=200):
+    def pidmovegyrodegree(self, degree, speed, minimumSpeed=100):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
-        pidDistance = [0, 0]
+        pidDistance = [0, 0, 0]
         while degree != currentAngle:
-            pidDistance = self.pidmovedistance(degree, speed, minimumSpeed=minimumSpeed, move=False, currentAngle=currentAngle, last_error=pidDistance[1])
+            pidDistance = self.pidmovedistance(degree, speed, minimumSpeed=minimumSpeed, move=False, currentAngle=currentAngle, last_error=pidDistance[1], derivative=pidDistance[2])
             if pidDistance == None:
                 break
-            print(pidDistance)
             gyroError = self.sensor1.angle() - currentDegree
-            print(self.sensor1.angle())
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
             gyroLastError = gyroError
             changeSpeed = CheckLimit.maximum((gyroDerivative * self.gyrokd) + (gyroError * self.gyrokp) + (gyroIntegral * self.gyroki), 200)
-            leftspeed = pidDistance[0] - changeSpeed
-            rightspeed = pidDistance[0] + changeSpeed
-            print(changeSpeed)
-            self.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1000), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1000))
+            leftspeed = pidDistance[0] + changeSpeed
+            rightspeed = pidDistance[0] - changeSpeed
+            self.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1200), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1200))
+        self.stop()
 
     def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None):
         currentAngle = self.motorb.angle()
@@ -111,14 +117,13 @@ class Robot:
         gyroDerivative = 0
         gyroLastError = 0
         sensor = self.sensorVal(sensorNo+1)
-        while ((sum(sensor) <= rgb+50) and (sum(sensor) >= rgb-50))!= False:
-            print(sensor)
+        while ((sum(sensor) <= rgb+20) and (sum(sensor) >= rgb-20)) == False:
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
             gyroLastError = gyroError
             changeSpeed = CheckLimit.maximum((gyroDerivative * self.gyrokd) + (gyroError * self.gyrokp) + (gyroIntegral * self.gyroki), 200)
-            self.move(CheckLimit.minimaximum(speed+changeSpeed, minimumSpeed, 1000), CheckLimit.minimaximum(speed-changeSpeed, minimumSpeed, 1000))
+            self.move(CheckLimit.minimaximum(speed+changeSpeed, minimumSpeed, 1200), CheckLimit.minimaximum(speed-changeSpeed, minimumSpeed, 1200))
             if stopAfter != None:
                 if currentAngle + stopAfter <= self.motorb.angle():
                     break
@@ -129,17 +134,10 @@ class Robot:
         
     def depositWater(self):
         self.motord.run_target(1500, 90)
-        print("true")
         self.motord.run(500)
-        print(1)
         time.sleep(1)
-        print(2)
-        print(self.motord.angle())
-        # 
         self.motord.run(-500)
-        print(4)
         self.motord.run_target(-1500, -1)
-        print(3)
 
             
 
@@ -171,6 +169,9 @@ class BaseSpeed:
         self.leftBase = leftBase,
         self.rightBase = rightBase,
 
-class StartingPos(Enum):
+class StartingPos():
     RIGHT = 1
-    LEFT = 2
+    LEFT = -1
+
+    def __int__(self):
+		return int('{0}'.format(self.value))
