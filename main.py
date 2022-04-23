@@ -23,8 +23,9 @@ robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COU
 
 #NOTE: reset arm position
 robot.resetRobot()
-robot = section1(robot)
-robot = section2(robot)
+robot.pidLineTracking(135, 300, 3, 13)
+# robot = section1(robot)
+# robot = section2(robot)
 
 # Write your program here.
 # Motor(Port.D).run(10000)

@@ -6,11 +6,15 @@ class Robot:
     forwardkp = 2
     forwardkd = 0
     gyroki = 0
-    gyrokp = 1
+    gyrokp = 3
     gyrokd = 0
     turnki = 0
-    turnkp = 3
-    turnkd = 0
+    turnkp = 2.7
+    turnkd = 0.2
+    trackkp = 1 
+    trackki = 0
+    trackkd = 0
+
 
     startingPos = None
     
@@ -116,7 +120,7 @@ class Robot:
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
-        sensor = self.sensorVal(sensorNo+1)
+        sensor = self.sensorVal(sensorNo)
         while ((sum(sensor) <= rgb+20) and (sum(sensor) >= rgb-20)) == False:
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
@@ -128,10 +132,24 @@ class Robot:
                 if currentAngle + stopAfter <= self.motorb.angle():
                     break
                     return None
-            sensor = self.sensorVal(sensorNo+1)
+            sensor = self.sensorVal(sensorNo)
         self.stop()
         return self.sensorVal(sensorNo+1)
-        
+    
+    def pidLineTracking(self, rgb, speed, sensor, rgb2):
+        integral = 0
+        lastError = 0
+        print(self.sensorVal(3))
+        while sum(self.sensorVal(sensor)) < rgb2:
+            error = sum(self.sensorVal(1)) - rgb
+            integral = integral + error
+            derivative = error - lastError
+            lastError = error
+            change = CheckLimit.maximum((derivative * self.trackkd) + (error * self.trackkp) + (integral * self.trackki), 200)
+            print(change)
+            self.move(-speed - change, -speed + change)
+        self.stop()
+
     def depositWater(self):
         self.motord.run_target(1500, 90)
         self.motord.run(500)
