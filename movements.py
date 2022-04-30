@@ -1,6 +1,13 @@
 import time
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 
+
+# pidturn(self, speed, degree, minimumSpeed=10, oneWheel=0)
+# pidmovedistance(self, degree, speed, minimumSpeed=200, move=True, currentAngle=0, last_error=0, derivative=0)
+# pidmovegyrodegree(self, degree, speed, minimumSpeed=100)
+# gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10)
+# pidLineTracking(self, rgb, speed, sensor, rgb2)
+
 class Robot:
     forwardki = 0
     forwardkp = 2
@@ -9,8 +16,8 @@ class Robot:
     gyrokp = 3
     gyrokd = 0
     turnki = 0
-    turnkp = 2.7
-    turnkd = 0.2
+    turnkp = 9
+    turnkd = 0
     trackkp = 1 
     trackki = 0
     trackkd = 0
@@ -34,6 +41,7 @@ class Robot:
     def stop(self):
         self.motorb.brake()
         self.motorc.brake()
+        self.motord.brake()
 
     def move(self, leftspeed, rightspeed):
         self.motorb.run(leftspeed)
@@ -52,32 +60,42 @@ class Robot:
         else:
             return sensors[sensorNo].rgb()
     
-    def pidturn(self, speed, degree, minimumSpeed=30, oneWheel=0):
+    def pidturn(self, speed, degree, minimumSpeed=1, oneWheel=0):
         currentAngle = self.sensor1.angle()
         integral = 0
         lastError = 0
-        while self.sensorVal(0) != (currentAngle + degree):
+        errors = []
+        while True:
             error = self.sensor1.angle() - (currentAngle + degree)
-            integral = integral + error
-            derivative = error - lastError
-            lastError = error
-            changeSpeed = (derivative * self.turnkd) + (error * self.turnkp) + (integral * self.turnki)
-            if changeSpeed > 0:
-                changeSpeed += speed
-            else:
-                changeSpeed -= speed
-            changeSpeed = CheckLimit.minimaximum(changeSpeed, minimumSpeed, 1200)
-            if (oneWheel == 0):
-                right = -changeSpeed
-                left = changeSpeed
-            elif (oneWheel == 1):
-                right = -changeSpeed
-                left = 0
-            elif (oneWheel == 2):
-                right = 0
-                left = changeSpeed
-            self.move(left, right)
-        self.stop()
+            print(error)
+            errors.append(error)
+            for i in range(5):
+                if i == 4:
+                    return
+                if errors[(len(errors) - i - 1)] != 0:
+                    break
+            if error == 0:
+                self.stop()
+            else: 
+                integral = integral + error
+                derivative = error - lastError
+                lastError = error
+                changeSpeed = (derivative * self.turnkd) + (error * self.turnkp) + (integral * self.turnki)
+                if changeSpeed > 0:
+                    changeSpeed += speed
+                else:
+                    changeSpeed -= speed
+                changeSpeed = CheckLimit.minimaximum(changeSpeed, minimumSpeed, 1200)
+                if (oneWheel == 0):
+                    right = -changeSpeed
+                    left = changeSpeed
+                elif (oneWheel == 1):
+                    right = -changeSpeed
+                    left = 0
+                elif (oneWheel == 2):
+                    right = 0
+                    left = changeSpeed
+                self.move(left, right)
 
     def pidmovedistance(self, degree, speed, minimumSpeed=200, move=True, currentAngle=0, last_error=0, derivative=0):
         if move:
@@ -114,14 +132,14 @@ class Robot:
             self.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1200), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1200))
         self.stop()
 
-    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None):
+    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
         sensor = self.sensorVal(sensorNo)
-        while ((sum(sensor) <= rgb+20) and (sum(sensor) >= rgb-20)) == False:
+        while ((sum(sensor) <= rgb+leeway1) and (sum(sensor) >= rgb-leeway2)) == False:
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
@@ -134,7 +152,7 @@ class Robot:
                     return None
             sensor = self.sensorVal(sensorNo)
         self.stop()
-        return self.sensorVal(sensorNo+1)
+        return self.sensorVal(sensorNo)
     
     def pidLineTracking(self, rgb, speed, sensor, rgb2):
         integral = 0
