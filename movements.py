@@ -9,6 +9,8 @@ from pybricks.parameters import Port, Stop, Direction, Button, Color
 # pidLineTracking(self, rgb, speed, sensor, rgb2)
 
 class Robot:
+
+    #PID values
     forwardki = 0
     forwardkp = 2
     forwardkd = 0
@@ -22,9 +24,11 @@ class Robot:
     trackki = 0
     trackkd = 0
 
-
+    #
     startingPos = None
-    
+    human = [0,0]
+
+
     def __init__(self, ev3, motorb, motorc, motord, sensor1, sensor2, sensor3, sensor4):
         self.ev3 = ev3
         self.motorb = motorb
@@ -130,16 +134,18 @@ class Robot:
             leftspeed = pidDistance[0] + changeSpeed
             rightspeed = pidDistance[0] - changeSpeed
             self.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1200), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1200))
-        self.stop()
+        self.stop() 
 
-    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10):
+    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10, condition=None):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
         sensor = self.sensorVal(sensorNo)
-        while ((sum(sensor) <= rgb+leeway1) and (sum(sensor) >= rgb-leeway2)) == False:
+        if condition != None:
+            print(condition())
+        while (condition == None and ((sum(sensor) <= rgb+leeway1) and (sum(sensor) >= rgb-leeway2)) == False) or (condition != None and condition()):
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
@@ -168,12 +174,30 @@ class Robot:
             self.move(-speed - change, -speed + change)
         self.stop()
 
+    def checkColour(self, rgbValue, direction, moveForward=False, box=0):
+        if sum(rgbValue) < 25:
+            self.collectChemical(direction)
+        elif rgbValue[0] > 70 and rgbValue[1] < 70 and rgbValue[2] < 70:
+            self.depositwater()
+        elif sum(rgbValue) > 170:
+            if self.human[0] == 0:
+                self.human[0] = box
+            else: 
+                self.human[1] = box
+
     def depositWater(self):
         self.motord.run_target(1500, 90)
         self.motord.run(500)
         time.sleep(1)
         self.motord.run(-500)
         self.motord.run_target(-1500, -1)
+
+    def collectChemical(self, direction):
+        self.pidmovegyrodegree(40, 200)
+        self.pidturn(0, (-2*direction+3)*90, oneWheel=direction)
+        self.pidmovegyrodegree(-140, 200)
+        self.motord.run_target(-1500, 200)
+        self.motord.brake()
 
             
 

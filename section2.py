@@ -2,9 +2,16 @@ from movements import Robot
 import time
 
 def section2(robot):
-    detected = robot.gyroForwardTillSense(300, 3, 15, stopAfter=400, leeway1=400, leeway2=0)
+    if robot == None:
+        return robot
+    def condition():
+        return (robot.sensorVal(1)[0] > 70 or robot.sensorVal(1)[1] > 70 or robot.sensorVal(1)[2] < 70)
+    test=condition
+    detected = robot.gyroForwardTillSense(300, 3, 15, stopAfter=400, leeway1=400, leeway2=0, condition=test)
     if detected != None:
         #Check color
+        if detected < 20:
+            print()
         print(detected)
     # robot.pidmovegyrodegree(200, 500)
     # #change stop after if needed

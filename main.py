@@ -25,8 +25,9 @@ robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COU
 robot.resetRobot()
 # robot.pidturn(0, 90, oneWheel=1)
 # robot.pidLineTracking(135, 300, 3, 13)
-robot = section1(robot)
-robot = section2(robot)
+robot.collectChemical(2)
+# robot = section1(robot)
+# robot = section2(robot)
 
 # Write your program here.
 # Motor(Port.D).run(10000)
