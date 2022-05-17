@@ -2,6 +2,7 @@
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.nxtdevices import ColorSensor as NxtColorSensor
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
@@ -19,15 +20,16 @@ from section2 import section2
 
 # Create your objects here.
 ev3 = EV3Brick()
-robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), ColorSensor(Port.S3), ColorSensor(Port.S4))
+robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4))
 
 #NOTE: reset arm position
 robot.resetRobot()
 # robot.pidturn(0, 90, oneWheel=1)
 # robot.pidLineTracking(135, 300, 3, 13)
-robot.collectChemical(2)
-# robot = section1(robot)
-# robot = section2(robot)
+# robot.collectChemical(2)
+# print(robot.sensorVal(1))
+robot = section1(robot)
+robot = section2(robot)
 
 # Write your program here.
 # Motor(Port.D).run(10000)

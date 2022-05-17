@@ -15,7 +15,7 @@ class Robot:
     forwardkp = 2
     forwardkd = 0
     gyroki = 0
-    gyrokp = 3
+    gyrokp = 4
     gyrokd = 0
     turnki = 0
     turnkp = 9
@@ -56,6 +56,8 @@ class Robot:
         self.motorc.reset_angle(0)
         self.motord.reset_angle(0)
         self.sensor1.reset_angle(0)
+        self.motorb.control.limits(1500)
+        self.motorc.control.limits(1500)
 
     def sensorVal(self, sensorNo):
         sensors = [self.sensor1, self.sensor2, self.sensor3, self.sensor4]
@@ -64,14 +66,15 @@ class Robot:
         else:
             return sensors[sensorNo].rgb()
     
-    def pidturn(self, speed, degree, minimumSpeed=1, oneWheel=0):
+    def pidturn(self, speed, degree, minimumSpeed=10, oneWheel=0):
+        # Right wheel turn: 1
+        # Left wheel turn: 2
         currentAngle = self.sensor1.angle()
         integral = 0
         lastError = 0
         errors = []
         while True:
             error = self.sensor1.angle() - (currentAngle + degree)
-            print(error)
             errors.append(error)
             for i in range(5):
                 if i == 4:
@@ -101,7 +104,7 @@ class Robot:
                     left = changeSpeed
                 self.move(left, right)
 
-    def pidmovedistance(self, degree, speed, minimumSpeed=200, move=True, currentAngle=0, last_error=0, derivative=0):
+    def pidmovedistance(self, degree, speed, minimumSpeed=100, move=True, currentAngle=0, last_error=0, derivative=0):
         if move:
             currentAngle = self.motorb.angle()
         while degree != self.motorb.angle() - currentAngle:
@@ -115,7 +118,7 @@ class Robot:
             else:
                 return [speed, last_error, derivative]
     
-    def pidmovegyrodegree(self, degree, speed, minimumSpeed=100):
+    def pidmovegyrodegree(self, degree, speed, minimumSpeed=80):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         gyroIntegral = 0
@@ -143,19 +146,28 @@ class Robot:
         gyroDerivative = 0
         gyroLastError = 0
         sensor = self.sensorVal(sensorNo)
-        if condition != None:
-            print(condition())
-        while (condition == None and ((sum(sensor) <= rgb+leeway1) and (sum(sensor) >= rgb-leeway2)) == False) or (condition != None and condition()):
+        while True:
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
             gyroDerivative = gyroError - gyroLastError
             gyroLastError = gyroError
             changeSpeed = CheckLimit.maximum((gyroDerivative * self.gyrokd) + (gyroError * self.gyrokp) + (gyroIntegral * self.gyroki), 200)
             self.move(CheckLimit.minimaximum(speed+changeSpeed, minimumSpeed, 1200), CheckLimit.minimaximum(speed-changeSpeed, minimumSpeed, 1200))
-            if stopAfter != None:
-                if currentAngle + stopAfter <= self.motorb.angle():
-                    break
-                    return None
+            # if condition != None:
+            #     print(condition())
+            #     print(sensor)
+            if ((sum(sensor) <= rgb+leeway1) and (sum(sensor) >= rgb-leeway2)) != False:
+                print(1)
+                self.stop()
+                return sensor
+            elif condition != None and (condition()) == False:
+                print(2)
+                self.stop()
+                return None
+            elif stopAfter != None and (currentAngle + stopAfter <= self.motorb.angle()):
+                print(3)
+                self.stop()
+                return None
             sensor = self.sensorVal(sensorNo)
         self.stop()
         return self.sensorVal(sensorNo)
@@ -163,23 +175,24 @@ class Robot:
     def pidLineTracking(self, rgb, speed, sensor, rgb2):
         integral = 0
         lastError = 0
-        print(self.sensorVal(3))
         while sum(self.sensorVal(sensor)) < rgb2:
             error = sum(self.sensorVal(1)) - rgb
             integral = integral + error
             derivative = error - lastError
             lastError = error
             change = CheckLimit.maximum((derivative * self.trackkd) + (error * self.trackkp) + (integral * self.trackki), 200)
-            print(change)
             self.move(-speed - change, -speed + change)
         self.stop()
 
-    def checkColour(self, rgbValue, direction, moveForward=False, box=0):
-        if sum(rgbValue) < 25:
+    def checkColour(self, rgbValue, direction, box, moveForward=False):
+        #Direction: Left 1, Right 2
+        #Box: Red 1, Brown 2, Yellow 3, White 4, Green 5, Blue 6
+        print(1)
+        if sum(rgbValue) > 40 and sum(rgbValue) < 100:
             self.collectChemical(direction)
         elif rgbValue[0] > 70 and rgbValue[1] < 70 and rgbValue[2] < 70:
             self.depositwater()
-        elif sum(rgbValue) > 170:
+        elif sum(rgbValue) > 250:
             if self.human[0] == 0:
                 self.human[0] = box
             else: 
@@ -195,9 +208,12 @@ class Robot:
     def collectChemical(self, direction):
         self.pidmovegyrodegree(40, 200)
         self.pidturn(0, (-2*direction+3)*90, oneWheel=direction)
-        self.pidmovegyrodegree(-140, 200)
+        self.pidmovegyrodegree(-130, 200)
         self.motord.run_target(-1500, 200)
         self.motord.brake()
+        time.sleep(0.5)
+        self.pidmovegyrodegree(140, 200)
+        self.pidturn(0, (-2*direction+3)*-90, oneWheel=direction)
 
             
 

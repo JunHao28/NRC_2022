@@ -4,16 +4,36 @@ import time
 def section2(robot):
     if robot == None:
         return robot
-    def condition():
-        return (robot.sensorVal(1)[0] > 70 or robot.sensorVal(1)[1] > 70 or robot.sensorVal(1)[2] < 70)
-    test=condition
-    detected = robot.gyroForwardTillSense(300, 3, 15, stopAfter=400, leeway1=400, leeway2=0, condition=test)
+    #Do for plan a
+    robot.pidmovegyrodegree(-155, -700)  
+    robot.pidturn(0, int(robot.startingPos) * -90, oneWheel=2)
+    print("Angle after turn:", robot.sensorVal(0))
+    time.sleep(0.1)
+    def checkCondition():
+        if int(robot.startingPos) == 1:
+            return (robot.sensorVal(1)[0] > 20 or robot.sensorVal(1)[1] > 20 or robot.sensorVal(1)[2] < 40)
+        elif int(robot.startingPos) == -1:
+            #Change
+            return (robot.sensorVal(1)[0] > 60 or robot.sensorVal(1)[1] > 60 or robot.sensorVal(1)[2] < 60)
+    condition=checkCondition
+    detected = robot.gyroForwardTillSense(300, 3, 40, leeway1=400, leeway2=0, condition=condition)
     if detected != None:
-        #Check color
-        if detected < 20:
-            print()
-        print(detected)
-    # robot.pidmovegyrodegree(200, 500)
+        robot.checkColour(detected, 2, (2.5*int(robot.startingPos)+3.5))
+    robot.pidmovegyrodegree(400, 500)
+    detected = robot.gyroForwardTillSense(300, 3, 40, stopAfter=100, leeway1=400, leeway2=0)
+    if detected != None:
+        robot.checkColour(detected, 2, (2.5*int(robot.startingPos)+3.5))
+    def checkCondition():
+        if int(robot.startingPos) == 1:
+            return (robot.sensorVal(1)[0] > 20 or robot.sensorVal(1)[1] < 40 or robot.sensorVal(1)[2] > 20)
+        elif int(robot.startingPos) == -1:
+            #Change
+            return (robot.sensorVal(1)[0] > 60 or robot.sensorVal(1)[1] > 60 or robot.sensorVal(1)[2] < 60)
+    condition=checkCondition
+    detected = robot.gyroForwardTillSense(300, 3, 40, leeway1=400, leeway2=0, condition=condition)
+    if detected != None:
+        robot.checkColour(detected, 2, (2.5*int(robot.startingPos)+3.5))
+    
     # #change stop after if needed
     # detected = robot.gyroForwardTillSense(300, 3, 15, stopAfter=400, leeway1=400, leeway2=0)
     # if detected != None:
