@@ -5,8 +5,8 @@ def section2(robot):
     if robot == None:
         return robot
     #Do for plan a
-    robot.pidmovegyrodegree(-155, -700)  
-    robot.pidturn(0, int(robot.startingPos) * -90, oneWheel=2)
+    robot.pidmovegyrodegree(-160, -700)  
+    robot.pidturn(0, int(robot.startingPos) * -180 + robot.sensorVal(0), oneWheel=2)
     print("Angle after turn:", robot.sensorVal(0))
     time.sleep(0.1)
     def checkCondition():
@@ -16,11 +16,13 @@ def section2(robot):
             #Change
             return (robot.sensorVal(1)[0] > 60 or robot.sensorVal(1)[1] > 60 or robot.sensorVal(1)[2] < 60)
     condition=checkCondition
-    detected = robot.gyroForwardTillSense(300, 3, 40, leeway1=400, leeway2=0, condition=condition)
+    detected = robot.gyroForwardTillSense(300, 3, 40, leeway1=400, leeway2=0, condition=condition, override=0)
+    print("Angle 1:", robot.sensorVal(0))
     if detected != None:
         robot.checkColour(detected, 2, (2.5*int(robot.startingPos)+3.5))
     robot.pidmovegyrodegree(400, 500)
-    detected = robot.gyroForwardTillSense(300, 3, 40, stopAfter=100, leeway1=400, leeway2=0)
+    detected = robot.gyroForwardTillSense(300, 3, 40, stopAfter=100, leeway1=400, leeway2=0, override=0)
+    print("Angle 2:", robot.sensorVal(0))
     if detected != None:
         robot.checkColour(detected, 2, (2.5*int(robot.startingPos)+3.5))
     def checkCondition():

@@ -43,9 +43,9 @@ class Robot:
         self.ev3.speaker.beep()
 
     def stop(self):
-        self.motorb.brake()
-        self.motorc.brake()
-        self.motord.brake()
+        self.motorb.hold()
+        self.motorc.hold()
+        self.motord.hold()
 
     def move(self, leftspeed, rightspeed):
         self.motorb.run(leftspeed)
@@ -76,8 +76,9 @@ class Robot:
         while True:
             error = self.sensor1.angle() - (currentAngle + degree)
             errors.append(error)
-            for i in range(5):
-                if i == 4:
+            for i in range(10):
+                if i == 9:
+                    print(self.sensor1.angle())
                     return
                 if errors[(len(errors) - i - 1)] != 0:
                     break
@@ -139,13 +140,16 @@ class Robot:
             self.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1200), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1200))
         self.stop() 
 
-    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10, condition=None):
+    def gyroForwardTillSense(self, speed, sensorNo, rgb, minimumSpeed=200, stopAfter=None, leeway1=10, leeway2=10, condition=None, override=None):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         gyroIntegral = 0
         gyroDerivative = 0
         gyroLastError = 0
         sensor = self.sensorVal(sensorNo)
+        if override != None:
+            print(True)
+            currentDegree = override
         while True:
             gyroError = self.sensorVal(0) - currentDegree
             gyroIntegral = gyroIntegral + gyroError
@@ -187,11 +191,11 @@ class Robot:
     def checkColour(self, rgbValue, direction, box, moveForward=False):
         #Direction: Left 1, Right 2
         #Box: Red 1, Brown 2, Yellow 3, White 4, Green 5, Blue 6
-        print(1)
-        if sum(rgbValue) > 40 and sum(rgbValue) < 100:
+        print(rgbValue)
+        if sum(rgbValue) > 30 and rgbValue[0] - rgbValue[1] < 10 and rgbValue[0] - rgbValue[1] > -10 and rgbValue[1] - rgbValue[2] < 10 and rgbValue[1] - rgbValue[2] > -10:
             self.collectChemical(direction)
-        elif rgbValue[0] > 70 and rgbValue[1] < 70 and rgbValue[2] < 70:
-            self.depositwater()
+        elif rgbValue[0] > 60 and rgbValue[1] < 60 and rgbValue[2] < 60:
+            self.depositWater()
         elif sum(rgbValue) > 250:
             if self.human[0] == 0:
                 self.human[0] = box
@@ -208,11 +212,11 @@ class Robot:
     def collectChemical(self, direction):
         self.pidmovegyrodegree(40, 200)
         self.pidturn(0, (-2*direction+3)*90, oneWheel=direction)
-        self.pidmovegyrodegree(-130, 200)
+        self.pidmovegyrodegree(-160, 200)
         self.motord.run_target(-1500, 200)
-        self.motord.brake()
+        self.stop()
         time.sleep(0.5)
-        self.pidmovegyrodegree(140, 200)
+        self.pidmovegyrodegree(160, 200)
         self.pidturn(0, (-2*direction+3)*-90, oneWheel=direction)
 
             
