@@ -13,6 +13,7 @@ from movements import Robot
 #Program Files
 from section1 import section1
 from section2 import section2
+from movements import StartingPos
 
 # Documentation:
 # https://pybricks.com/ev3-micropython/ev3devices.html
@@ -24,13 +25,30 @@ robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COU
 
 #NOTE: reset arm position
 robot.resetRobot()
-# robot.pidturn(0, 90, oneWheel=1)
-# robot.pidLineTracking(135, 300, 3, 13)
-# robot.collectChemical(2)
-# print(robot.sensorVal(3))
-# robot.checkColour(robot.sensorVal(3), 2, 1)
+# robot.startingPos = StartingPos.RIGHT
 robot = section1(robot)
 robot = section2(robot)
+# robot.pidmovegyrodegree(-1500, -200)
+# robot.pidturn(0, 90, oneWheel=0)
+# robot.stop()
+# robot.beep()
+# time.sleep(1)
+print(robot.sensorVal(2))
+
+#(25, 18, 7)
+#Test if can go faster
+#Test
+
+# robot.pidturn(0, 90, oneWheel=1)
+# print(robot.sensor2.rgb())
+# robot.pidLineTracking(25, 300)
+
+# robot.collectChemical(2)
+# print(robot.sensorVal(3))
+# print(robot.sensor2.reflection())
+# robot.checkColour(robot.sensorVal(3), 2, 1)
+
+
 
 # Write your program here.
 # Motor(Port.D).run(10000)
@@ -42,8 +60,6 @@ robot = section2(robot)
 # Motor(Port.D).run(-10000)
 # time.sleep(0.7)
 # Motor(Port.D).brake()
-
-
 
 # color = robot.gyroForwardTillSense(300, 0, 5, stopAfter=200)
 # if color[0] >= 10 and color[1] <= 10 and color[2] <= 10:
