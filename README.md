@@ -1,9 +1,8 @@
 ## NRC 2022
 -----
 ### Things to do
-- Tune line-tracking PID
-- Collect chemicals
-- Deposit water
+- Check if white wall values compared to chemicals are okay
+- Perfect pid turn
 - Complete sections
 -----
 ### Comments to take note of

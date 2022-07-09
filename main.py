@@ -1,19 +1,25 @@
 #!/usr/bin/env pybricks-micropython
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+from pybricks.ev3devices import (Motor, TouchSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.ev3devices import ColorSensor as Ev3ColorSensor                                 
 from pybricks.nxtdevices import ColorSensor as NxtColorSensor
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 import time
-from movements import Robot
+# import sys
+
+# sys.path.append('../')
+
+from functions.robot import Robot
+
 
 #Program Files
-from section1 import section1
-from section2 import section2
-from movements import StartingPos
+from sections.section1 import section1
+from sections.section2 import section2
+from functions.unchanged.StartingPos import StartingPos
 
 # Documentation:
 # https://pybricks.com/ev3-micropython/ev3devices.html
@@ -21,25 +27,35 @@ from movements import StartingPos
 
 # Create your objects here.
 ev3 = EV3Brick()
-robot = Robot(ev3, Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D), GyroSensor(Port.S1), ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4))
+# robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4)])
+robot = Robot(ev3, [0, 0, 0], [0, 0, 0, 0])
+# robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NXTColorSensor(Port.S3), NXTColorSensor(Port.S4)])
+robot.movement.sound()
+
 
 #NOTE: reset arm position
-robot.resetRobot()
-# robot.startingPos = StartingPos.RIGHT
-robot = section1(robot)
-robot = section2(robot)
+# robot.resetRobot()
+ev3.speaker.beep()
+robot.startingPos = StartingPos.RIGHT
+# robot = section1(robot)
+# robot = section2(robot)
+# def checkCondition():
+#     return False
+# condition = checkCondition
+# robot.turn(0, 90, oneWheel=2)
+# robot.pidmovegyrodegree(160, -700)
+
+time.sleep(1)
 # robot.pidmovegyrodegree(-1500, -200)
-# robot.pidturn(0, 90, oneWheel=0)
+# robot.turn(0, 90, oneWheel=0)
 # robot.stop()
 # robot.beep()
 # time.sleep(1)
-print(robot.sensorVal(2))
+# print(robot.sensorVal(2))
 
 #(25, 18, 7)
-#Test if can go faster
-#Test
 
-# robot.pidturn(0, 90, oneWheel=1)
+# robot.turn(0, 90, oneWheel=1)
 # print(robot.sensor2.rgb())
 # robot.pidLineTracking(25, 300)
 
