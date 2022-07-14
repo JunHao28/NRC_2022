@@ -10,8 +10,8 @@ from functions.unchanged.CheckLimit import CheckLimit
 class Movement:
 
     # PID values
-    forward = PID(0.08, 5, 2)
-    gyro = PID(5, 0, 0)
+    forward = PID(6, 0, 3)
+    gyros = PID(10, 0, 2.5)
     oneWheelTurn = PID(15, 0.000000025, 8)
     twoWheelTurn = PID(7.5, 0.000000025, 4)
     track = PID(1.4, 0, 3)
@@ -67,6 +67,7 @@ class Movement:
     def decelerate(self, speed, degree, minimumSpeed=100, move=True, currentAngle=0, result=[0, 0, 0]):
         if move:
             currentAngle = self.motorb.angle()
+            result = [0, 0, 1000]
         while degree != (self.motorb.angle() - currentAngle):
             error = degree - (self.motorb.angle()-currentAngle)
             result = self.forward.pid(error, result[1], result[2])
@@ -76,7 +77,7 @@ class Movement:
             else:
                 return result
 
-    def gyro(self, speed, condition=None, minimumSpeed=50, override=None, inputs=None):
+    def gyro(self, speed=700, condition=None, minimumSpeed=50, override=None, inputs=None):
         outputs = [0, 0, 0]
         if inputs == None:
             currentDegree = self.sensor1.angle()
@@ -88,10 +89,10 @@ class Movement:
             currentDegree = override
         while True:
             gyroError = self.sensor1.angle() - currentDegree
-            outputs = self.gyro.pid(gyroError, outputs[1], outputs[2])
-            leftspeed = (speed - outputs[0]) if (speed >
+            outputs = self.gyros.pid(gyroError, outputs[1], outputs[2])
+            rightspeed = (speed - outputs[0]) if (speed >
                                                  0) else -(speed - outputs[0])
-            rightspeed = speed + \
+            leftspeed = speed + \
                 outputs[0] if(speed > 0) else -(speed + outputs[0])
             if condition != None and condition():
                 return
@@ -107,14 +108,14 @@ class Movement:
         currentDegree = self.sensor1.angle()
         if override != None:
             currentDegree = override
-        output = [0, 0, 0, 0]
+        output = [0, 1000, 0, 0]
         pidDistance = [0, 0, 0]
         while True:
             pidDistance = self.decelerate(
                 speed, degree, minimumSpeed=minimumSpeed, move=False, currentAngle=currentAngle, result=pidDistance)
             if pidDistance == None:
                 break
-            output = self.gyro(speed, minimumSpeed=minimumSpeed, inputs=[
+            output = self.gyro(speed=700, minimumSpeed=minimumSpeed, inputs=[
                                output[0], output[1], currentDegree], override=override)
             self.basic.move(CheckLimit.minimaximum(output[2]+pidDistance[0], minimumSpeed, 1500),
                       CheckLimit.minimaximum(output[3]+pidDistance[0], minimumSpeed, 1500))
