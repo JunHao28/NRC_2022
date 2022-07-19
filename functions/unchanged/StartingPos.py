@@ -4,3 +4,6 @@ class StartingPos():
 
     def __int__(self):
         return int('{0}'.format(self.value))
+
+    def neg(self, number):
+        return self.int() * value

@@ -24,9 +24,18 @@ class Robot:
         self.basic = Basic(ev3, motor, sensor)
         self.colour = Colours(self.basic)
         self.movement = Movement(ev3, motor, sensor, self.basic)
-        self.tasks = Tasks(ev3, motor, sensor, self.basic, self.human, self.movement, lambda: self.wait())
+        self.tasks = Tasks(ev3, motor, sensor, self.colour, self.basic, self.human, self.movement, lambda: self.wait())
 
-    def wait(self, seconds):
-        self.stop(seconds/1000)
+    def pause(self, seconds):
+        self.stop(seconds*1000)
+
+    def neg(self, number):
+        return int(self.startingPos) * number
+
+    def side(self, right, left):
+        if int(self.startingPos) == -1:
+            return right
+        elif int(self.startingPos) == 1:
+            return left
 
     

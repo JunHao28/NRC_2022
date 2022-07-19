@@ -22,18 +22,18 @@ stopwatch = StopWatch()
 ev3 = EV3Brick()
 # robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4)], lambda: wait())
 # robot = Robot(ev3, [0, 0, 0], [0, 0, 0, 0])
-robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NXTColorSensor(Port.S3), NXTColorSensor(Port.S4)], lambda: wait())
+robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NXTColorSensor(Port.S3), NXTColorSensor(Port.S4)], lambda time: wait(time))
 # robot.basic.sound()
 
 
 #NOTE: reset arm position
 robot.basic.resetRobot()
-robot.startingPos = StartingPos.RIGHT
-robot.movement.gyro()
-robot.basic.stop()
+# robot.startingPos = StartingPos.RIGHT
+# robot.movement.turn(0, 90)
+# robot.movement.gyrodegree(1500, 900)
+robot = section1(robot)
+robot = section2(robot)
 wait(1000)
-# robot = section1(robot)
-# robot = section2(robot)
-print(stopwatch.time())
-# time.sleep(1)
+print((stopwatch.time()/1000)-1)
+
 
