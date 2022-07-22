@@ -15,7 +15,7 @@ def section1(robot):
         robot.startingPos = StartingPos.RIGHT
         # 1
 
-    robot.movement.gyrodegree(1500, 200 if robot.startingPos == 1 else 100, maximumSpeed=500)
+    robot.movement.gyrodegree(1500, robot.side(250, 100), maximumSpeed=500)
     robot.basic.beep()
     if (robot.startingPos == StartingPos.RIGHT):
         robot.movement.turn(0, -12, oneWheel=2)

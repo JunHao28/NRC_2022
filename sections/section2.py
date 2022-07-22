@@ -8,22 +8,22 @@ def section2(robot):
     #Reset Angle
     robot.sensor1.reset_angle(robot.neg(90))
 
-    robot.movement.gyrodegree(-700, robot.side(-150, -160))
+    robot.movement.gyrodegree(-700, robot.side(-150, -160), maximumSpeed=500)
     robot.pause(0.5)
-    robot.movement.turn(0, robot.basic.sense(0), oneWheel=robot.side(1, 2))
+    robot.movement.turn(0, robot.basic.sense(0), oneWheel=robot.side(2, 1))
     
     #Line tracking
-    robot.movement.lineTrackingTillSense(12, 400, lambda: robot.side(robot.colour.check("blue_floor"), robot.colour.check("brown_floor")))
+    robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 400, lambda: robot.colour[robot.side("blue_floor", "brown_floor")].condition())
 
-    #Face 0°
-    robot.movement.turn(0, robot.neg(180) - robot.sense(0))
+    #Face 180°
+    robot.movement.turn(0, robot.neg(180) - robot.basic.sense(0))
 
     #Detect 1
-    robot.gyroTillSense(-300, lambda: robot.tasks.checkColour(robot.sense(2), 1, robot.side(6, 2), stopAfter=-200, override=robot.neg(180)))
+    robot.gyroTillSense(-300, lambda: robot.tasks.checkColour(robot.basic.sense(2), 1, robot.side(6, 2), stopAfter=-200, override=robot.neg(180)))
     
     #Move forward
     robot.gyrodegree(-1000, -300)
-    robot.gyroTillSense(-300, lambda: robot.side(robot.colour.check("green_floor"), robot.colour.check("red_floor")), override=robot.neg(180))
+    robot.gyroTillSense(-300, lambda: robot.colour[robot.side("green_floor", "red_floor")].condition(), override=robot.neg(180))
     angleAtDetectGreen = robot.motorb.angle()
     robot.gyrodegree(-700, -150)
 

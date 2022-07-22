@@ -66,4 +66,4 @@ class Tasks:
             self.wait(0.5)
             self.movement.gyrodegree(160, 200)
             self.movement.turn(0, (-2*direction+3)*-90, oneWheel=direction)
-    
+

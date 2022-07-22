@@ -30,9 +30,9 @@ robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.CO
 robot.basic.resetRobot()
 # robot.startingPos = StartingPos.RIGHT
 # robot.movement.turn(0, 90)
-# robot.movement.gyrodegree(1500, 900)
-robot = section1(robot)
-robot = section2(robot)
+robot.movement.pidLineTracking(robot.colour["line_tracking"], 300)
+# robot = section1(robot)
+# robot = section2(robot)
 wait(1000)
 print((stopwatch.time()/1000)-1)
 
