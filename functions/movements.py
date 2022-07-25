@@ -13,7 +13,7 @@ class Movement:
     gyros = PID(90, 0, 10)
     oneWheelTurn = PID(15, 0.000000025, 8)
     twoWheelTurn = PID(7.5, 0.000000025, 4)
-    track = PID(0.28, 0, 2)
+    track = PID(1.4, 0, 3)
 
     # forwardki = 0.0001
     # forwardkp = 5
