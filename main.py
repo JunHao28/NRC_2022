@@ -29,10 +29,13 @@ robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.CO
 #NOTE: reset arm position
 robot.basic.resetRobot()
 # robot.startingPos = StartingPos.RIGHT
+# robot.sensor1.reset_angle(robot.neg(180))
 # robot.movement.turn(0, 90)
-robot.movement.pidLineTracking(robot.colour["line_tracking"], 300)
-# robot = section1(robot)
-# robot = section2(robot)
+# robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: robot.colour["blue_floor"].condition())
+# robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: False)
+robot = section1(robot)
+robot = section2(robot)
+robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2))
 wait(1000)
 print((stopwatch.time()/1000)-1)
 

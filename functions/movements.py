@@ -13,7 +13,7 @@ class Movement:
     gyros = PID(90, 0, 10)
     oneWheelTurn = PID(15, 0.000000025, 8)
     twoWheelTurn = PID(7.5, 0.000000025, 4)
-    track = PID(1.4, 0, 3)
+    track = PID(1.3, 0, 5)
 
     # forwardki = 0.0001
     # forwardkp = 5
@@ -97,13 +97,12 @@ class Movement:
         while True:
             gyroError = self.sensor1.angle() - currentDegree
             outputs = self.gyros.pid(gyroError, outputs[1], outputs[2])
-            rightspeed = (speed - outputs[0]) if (speed >
-                                                 0) else -(speed + outputs[0])
-            leftspeed = speed + outputs[0] if(speed > 0) else -(speed - outputs[0])
+            rightspeed = (speed - outputs[0]) if (speed > 0) else speed - outputs[0]
+            leftspeed = speed + outputs[0] if(speed > 0) else speed + outputs[0]
             if condition != None and condition():
                 return
             if inputs != None:
-                return [outputs[1], outputs[2], leftspeed, rightspeed]
+                return [outputs[1], outputs[2], CheckLimit.minimaximum(leftspeed, minimumSpeed, 1500), CheckLimit.minimaximum(rightspeed, minimumSpeed, 1500)]
             else:
                 self.basic.move(CheckLimit.minimaximum(leftspeed, minimumSpeed, 1500),
                                 CheckLimit.minimaximum(rightspeed, minimumSpeed, 1500))
@@ -134,26 +133,23 @@ class Movement:
         if override != None:
             currentDegree = override
         while True:
-            output = self.gyro(speed, minimumSpeed=minimumSpeed, inputs=[
+            output = self.gyro(speed=speed, minimumSpeed=minimumSpeed, inputs=[
                 outputs[0], outputs[1], currentDegree], override=override)
-            self.basic.move(CheckLimit.minimaximum(
-                output[2], minimumSpeed, 1500), CheckLimit.minimaximum(output[3], minimumSpeed, 1500))
+            self.basic.move(output[2], output[3])
             if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
-                self.basic.stop()
+                self.basic.stop()                
+                self.basic.beep()  
                 return None
         return
 
     def pidLineTracking(self, rgb, speed, returnVal=None):
         result = [0, 0, 0]
         if returnVal != None:
-            result[1] = returnVal[2]
-            result[2] = returnVal[3]
+            result = returnVal
         while True:
             error = self.sensor2.reflection() - rgb
-            print(error)
             result = self.track.pid(error, result[1], result[2], change=1)
             change = CheckLimit.maximum(result[0], 1500-speed)
-            print(change)
             if returnVal == None:
                 self.basic.move(-speed + change, - speed - change)
             else:
@@ -163,7 +159,7 @@ class Movement:
     def lineTrackingTillSense(self, rgb, speed, condition):
         returnVal = [0, 0, 0, 0]
         while True:
-            returnVal = self.pidLineTracking(speed, rgb, returnVal=returnVal)
+            returnVal = self.pidLineTracking(rgb, speed, returnVal=[0, returnVal[2], returnVal[3]])
             self.basic.move(returnVal[0], returnVal[1])
             if condition():
                 self.basic.stop()

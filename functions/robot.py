@@ -7,6 +7,7 @@ class Robot:
 
     startingPos = None
     human = [0, 0]
+    chemical = False
 
     def __init__(self, ev3, motor, sensor, wait):
         self.ev3 = ev3
@@ -26,13 +27,13 @@ class Robot:
             "brown_floor": Colour("brown_floor", lambda: (basic.sense(1)[0] > 15 and basic.sense(1)[1] < 15 and basic.sense(1)[2] < 15)),
             "green_floor": Colour("green_floor", lambda: (basic.sense(1)[0] > 15 or basic.sense(1)[1] < 30 or basic.sense(1)[2] > 20)),
             "red_floor": Colour("red_floor", lambda: (basic.sense(1)[0] < 40 or basic.sense(1)[1] > 20 or basic.sense(1)[2] > 20)),
-            "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 130 and val[0] - val[1] < 5 and val[0] - val[1] > -5 and val[1] - val[2] < 5 and val[1] - val[2] > -5),
+            "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 90 and val[0] - val[1] <= 5 and val[0] - val[1] >= -5 and val[1] - val[2] <= 5 and val[1] - val[2] >= -5),
             "fire": Colour("fire", lambda val: val[0] >= 50 and val[1] <= 50 and val[2] <= 50),
             "human": Colour("human", lambda val: sum(val) > 250),
-            "line_tracking": 14
+            "line_tracking": 37
         }
         self.movement = Movement(ev3, motor, sensor, self.basic)
-        self.tasks = Tasks(ev3, motor, sensor, self.colour, self.basic, self.human, self.movement, lambda: self.wait())
+        self.tasks = Tasks(ev3, motor, sensor, self.colour, self.basic, self.human, self.chemical, self.movement, lambda time: self.pause(time))
 
     def pause(self, seconds):
         self.stop(seconds*1000)
