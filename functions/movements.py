@@ -135,6 +135,7 @@ class Movement:
         while True:
             output = self.gyro(speed=speed, minimumSpeed=minimumSpeed, inputs=[
                 outputs[0], outputs[1], currentDegree], override=override)
+            print(output)
             self.basic.move(output[2], output[3])
             if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
                 self.basic.stop()                
@@ -151,9 +152,9 @@ class Movement:
             result = self.track.pid(error, result[1], result[2], change=1)
             change = CheckLimit.maximum(result[0], 1500-speed)
             if returnVal == None:
-                self.basic.move(-speed + change, - speed - change)
+                self.basic.move(-speed - change, - speed + change)
             else:
-                return [-speed + change, - speed - change, result[1], result[2]]
+                return [-speed - change, - speed + change, result[1], result[2]]
         self.basic.stop()
 
     def lineTrackingTillSense(self, rgb, speed, condition):

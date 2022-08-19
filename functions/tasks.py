@@ -20,9 +20,9 @@ class Tasks:
         # Direction: Left 1, Right 2
         # Box: Red 1, Brown 2, Yellow 3, White 4, Green 5, Blue 6
         # Special (Got wall for collecting chemical)
-        print(rgbValue)
+        # print(rgbValue)
         if self.colour["chemical"].condition(rgbValue):
-            self.collectChemical(direction, special=special)
+            # self.collectChemical(direction, special=special)
             return True
         elif self.colour["fire"].condition(rgbValue):
             self.depositWater()
@@ -38,11 +38,11 @@ class Tasks:
             return False
 
     def depositWater(self):
-        self.motord.run_target(1500, 90)
-        self.motord.run(500)
-        self.wait(1)
+        self.motord.run_target(-1500, -90)
         self.motord.run(-500)
-        self.motord.run_target(-1500, 0 if self.chemical == False else 200)
+        self.wait(1)
+        self.motord.run(500)
+        self.motord.run_target(1500, 0 if self.chemical == False else 200)
 
     def collectChemical(self, direction, special=0):
         self.ev3.speaker.beep(frequency=700)

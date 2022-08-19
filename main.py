@@ -20,20 +20,27 @@ from functions.unchanged.StartingPos import StartingPos
 # Create your objects here.
 stopwatch = StopWatch()
 ev3 = EV3Brick()
+
+motorb = Motor(Port.B)
+motorc = Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
+motord = Motor(Port.D)
+gyro = GyroSensor(Port.S1)
+sensor1 = Ev3ColorSensor(Port.S2)
+sensor2 = NXTColorSensor(Port.S3)
+sensor3 = NXTColorSensor(Port.S4)
 # robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4)], lambda: wait())
 # robot = Robot(ev3, [0, 0, 0], [0, 0, 0, 0])
-robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NXTColorSensor(Port.S3), NXTColorSensor(Port.S4)], lambda time: wait(time))
+robot = Robot(ev3, [motorb, motorc, motord], [gyro, sensor1, sensor2, sensor3], lambda time: wait(time))
 # robot.basic.sound()
 
 
 #NOTE: reset arm position
 robot.basic.resetRobot()
-# robot.startingPos = StartingPos.RIGHT
-# robot.sensor1.reset_angle(robot.neg(180))
+robot.startingPos = StartingPos.RIGHT
 # robot.movement.turn(0, 90)
 # robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: robot.colour["blue_floor"].condition())
 # robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: False)
-robot = section1(robot)
+# robot = section1(robot)
 robot = section2(robot)
 robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2))
 wait(1000)

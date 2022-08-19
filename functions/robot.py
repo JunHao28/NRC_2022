@@ -30,7 +30,7 @@ class Robot:
             "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 90 and val[0] - val[1] <= 5 and val[0] - val[1] >= -5 and val[1] - val[2] <= 5 and val[1] - val[2] >= -5),
             "fire": Colour("fire", lambda val: val[0] >= 50 and val[1] <= 50 and val[2] <= 50),
             "human": Colour("human", lambda val: sum(val) > 250),
-            "line_tracking": 37
+            "line_tracking": 14
         }
         self.movement = Movement(ev3, motor, sensor, self.basic)
         self.tasks = Tasks(ev3, motor, sensor, self.colour, self.basic, self.human, self.chemical, self.movement, lambda time: self.pause(time))

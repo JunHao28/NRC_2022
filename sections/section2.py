@@ -8,9 +8,9 @@ def section2(robot):
     #Reset Angle
     robot.sensor1.reset_angle(robot.neg(90))
 
-    robot.movement.gyrodegree(-700, robot.side(-150, -160), maximumSpeed=500)
+    robot.movement.gyrodegree(-700, robot.side(-155, -160), maximumSpeed=500)
     robot.pause(0.5)
-    robot.movement.turn(0, robot.basic.sense(0), oneWheel=robot.side(2, 1))
+    robot.movement.turn(0, robot.neg(robot.basic.sense(0)), oneWheel=robot.side(2, 2))
     
     #Line tracking
     robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: robot.colour[robot.side("blue_floor", "brown_floor")].condition())
@@ -18,25 +18,25 @@ def section2(robot):
     #Face 180°
     robot.movement.turn(0, robot.neg(180) - robot.basic.sense(0))
 
-    #Detect 1
-    robot.movement.gyroTillSense(-300, lambda: robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2)), stopAfter=-300, override=robot.neg(180))
+    # #Detect 1
+    robot.movement.gyroTillSense(-200, lambda: robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2)), stopAfter=-300, override=180)
     
-    #Move forward
-    robot.movement.gyrodegree(-1000, -300)
-    robot.movement.gyroTillSense(-300, lambda: robot.colour[robot.side("green_floor", "red_floor")].condition(), override=robot.neg(180))
-    angleAtDetectGreen = robot.motorb.angle()
-    robot.movement.gyrodegree(-700, -150)
+    # #Move forward
+    robot.movement.gyrodegree(-200, -300, override=180)
+    # robot.movement.gyroTillSense(-300, lambda: robot.colour[robot.side("green_floor", "red_floor")].condition(), override=robot.neg(180))
+    # angleAtDetectGreen = robot.motorb.angle()
+    # robot.movement.gyrodegree(-700, -150)
 
-    #Detect 2
-    robot.movement.gyroTillSense(300, lambda: robot.tasks.checkColour(robot.sense(2), 2, robot.side(6, 2), special=1), stopAfter=-200, override=robot.neg(180))    
+    # #Detect 2
+    # robot.movement.gyroTillSense(300, lambda: robot.tasks.checkColour(robot.sense(2), 2, robot.side(6, 2), special=1), stopAfter=-200, override=robot.neg(180))    
 
-    #Move Forward
-    robot.movement.gyrodegree(-700, -30)
+    # #Move Forward
+    # robot.movement.gyrodegree(-700, -30)
 
-    #Detect 3
-    if int(robot.startingPos) == 1:
-        robot.movement.gyroTillSense(300, lambda: robot.tasks.checkColour(robot.sense(2), 2, 5, special=1), stopAfter=-150, override=robot.neg(180), backwards=True)
-        robot.movement.gyrodegree(300, robot.motorb.angle() - angleAtDetectGreen)
+    # #Detect 3
+    # if int(robot.startingPos) == 1:
+    #     robot.movement.gyroTillSense(300, lambda: robot.tasks.checkColour(robot.sense(2), 2, 5, special=1), stopAfter=-150, override=robot.neg(180), backwards=True)
+    #     robot.movement.gyrodegree(300, 270 - (robot.motorb.angle() - angleAtDetectGreen))
     # robot.movement.turn(0, robot.side(90, 180), robot.side(2, 0))
     # robot.basic.move(1500, 1500)
     # robot.basic.pause(1)
