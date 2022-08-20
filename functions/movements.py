@@ -150,11 +150,11 @@ class Movement:
                 return None
         return
 
-    def pidLineTracking(self, rgb, speed, returnVal=None):
+    def pidLineTracking(self, rgb, speed, returnVal=None, condition=lambda: True):
         result = [0, 0, 0]
         if returnVal != None:
             result = returnVal
-        while True:
+        while condition():
             error = self.sensor2.reflection() - rgb
             result = self.track.pid(error, result[1], result[2], change=1)
             change = CheckLimit.maximum(result[0], 1500-speed)
@@ -164,11 +164,11 @@ class Movement:
                 return [-speed - change, - speed + change, result[1], result[2]]
         self.basic.stop()
 
-    def lineTrackingTillSense(self, rgb, speed, condition):
+    def lineTrackingTillSense(self, rgb, speed, condition, stopAfter=None, whiteblack=True):
         returnVal = [0, 0, 0, 0]
         while True:
             returnVal = self.pidLineTracking(rgb, speed, returnVal=[0, returnVal[2], returnVal[3]])
-            self.basic.move(returnVal[0], returnVal[1])
-            if condition():
+            self.basic.move(returnVal[0 if whiteblack else 1], returnVal[1 if whiteblack else 0])
+            if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
                 self.basic.stop()
                 return
