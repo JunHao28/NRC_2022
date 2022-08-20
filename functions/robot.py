@@ -23,14 +23,17 @@ class Robot:
         basic = Basic(ev3, motor, sensor)
         self.basic = basic
         self.colour = {
-            "blue_floor": Colour("blue_floor", lambda: (basic.sense(1)[0] < 10 and basic.sense(1)[1] < 30 and basic.sense(1)[2] > 30)),
-            "brown_floor": Colour("brown_floor", lambda: (basic.sense(1)[0] > 15 and basic.sense(1)[1] < 15 and basic.sense(1)[2] < 15)),
-            "green_floor": Colour("green_floor", lambda: (basic.sense(1)[0] > 15 or basic.sense(1)[1] < 30 or basic.sense(1)[2] > 20)),
             "red_floor": Colour("red_floor", lambda: (basic.sense(1)[0] < 40 or basic.sense(1)[1] > 20 or basic.sense(1)[2] > 20)),
-            "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 90 and val[0] - val[1] <= 5 and val[0] - val[1] >= -5 and val[1] - val[2] <= 5 and val[1] - val[2] >= -5),
+            "brown_floor": Colour("brown_floor", lambda: (basic.sense(1)[0] > 15 and basic.sense(1)[1] < 15 and basic.sense(1)[2] < 15)), #Not done yet
+            "yellow_floor": Colour("yello_floor", lambda: (basic.sense(1)[0] > 60 and basic.sense(1)[1] > 40 and basic.sense(1)[2] < 30)),
+            "blue_floor": Colour("blue_floor", lambda: (basic.sense(1)[0] < 15 and basic.sense(1)[1] < 30 and basic.sense(1)[2] > 40)),
+            "green_floor": Colour("green_floor", lambda: (basic.sense(1)[0] < 15 and basic.sense(1)[1] > 30 and basic.sense(1)[2] < 20)),
+            
+            # "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 30 and val[0] - val[1] <= 7 and val[0] - val[1] >= -7 and val[1] - val[2] <= 7 and val[1] - val[2] >= -7),
+            "chemical": Colour("chemical", lambda val: val[0] > 11 and val[0] < 19 and val[1] > 18 and val[1] < 24 and val[2] > 12 and val[2] < 18 and val[3] > 44 and val[3] < 48),
             "fire": Colour("fire", lambda val: val[0] >= 50 and val[1] <= 50 and val[2] <= 50),
             "human": Colour("human", lambda val: sum(val) > 250),
-            "line_tracking": 14
+            "line_tracking": 37
         }
         self.movement = Movement(ev3, motor, sensor, self.basic)
         self.tasks = Tasks(ev3, motor, sensor, self.colour, self.basic, self.human, self.chemical, self.movement, lambda time: self.pause(time))

@@ -6,6 +6,7 @@ from pybricks.ev3devices import ColorSensor as Ev3ColorSensor
 from pybricks.nxtdevices import ColorSensor as NXTColorSensor
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch
+from pybricks.iodevices import Ev3devSensor
 
 #Program Files
 from functions.robot import Robot
@@ -26,8 +27,8 @@ motorc = Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE)
 motord = Motor(Port.D)
 gyro = GyroSensor(Port.S1)
 sensor1 = Ev3ColorSensor(Port.S2)
-sensor2 = NXTColorSensor(Port.S3)
-sensor3 = NXTColorSensor(Port.S4)
+sensor2 = Ev3devSensor(Port.S3)
+sensor3 = Ev3devSensor(Port.S4)
 # robot = Robot(ev3, [Motor(Port.B), Motor(Port.C, positive_direction=Direction.COUNTERCLOCKWISE), Motor(Port.D)], [GyroSensor(Port.S1), Ev3ColorSensor(Port.S2), NxtColorSensor(Port.S3), NxtColorSensor(Port.S4)], lambda: wait())
 # robot = Robot(ev3, [0, 0, 0], [0, 0, 0, 0])
 robot = Robot(ev3, [motorb, motorc, motord], [gyro, sensor1, sensor2, sensor3], lambda time: wait(time))
@@ -42,7 +43,12 @@ robot.startingPos = StartingPos.RIGHT
 # robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 300, lambda: False)
 # robot = section1(robot)
 robot = section2(robot)
-robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2))
+robot.basic.stop()
+# robot.tasks.collectChemical(2, special=1)
+# print(robot.colour["green_floor"].condition())
+# robot.movement.gyro()
+print(robot.basic.sense(1))
+# robot.tasks.checkColour(robot.basic.sense(2), 2, robot.side(6, 2))
 wait(1000)
 print((stopwatch.time()/1000)-1)
 

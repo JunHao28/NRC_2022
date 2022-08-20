@@ -10,8 +10,9 @@ from functions.unchanged.CheckLimit import CheckLimit
 class Movement:
 
     # PID values
-    gyros = PID(90, 0, 10)
-    oneWheelTurn = PID(15, 0.000000025, 8)
+    # gyros = PID(90, 0, 10)
+    gyros = PID(20, 0, 5)
+    oneWheelTurn = PID(15, 0.000000028, 8)
     twoWheelTurn = PID(7.5, 0.000000025, 4)
     track = PID(1.3, 0, 5)
 
@@ -63,7 +64,7 @@ class Movement:
                 left = result[0] if (oneWheel != 2) else 0
                 self.basic.move(left, right)
 
-    def decelerate(self, degree, accelDist=40, deccelDist=200, maximumSpeed=1500, minimumSpeed=20, move=True, currentAngle=0):
+    def decelerate(self, degree, accelDist=40, deccelDist=250, maximumSpeed=1300, minimumSpeed=20, move=True, currentAngle=0):
         if move:
             currentAngle = self.motorb.angle()
             result = [0, 0, 1000]
@@ -73,7 +74,7 @@ class Movement:
             if finalAngle < accelDist:
                 speed = minimumSpeed + (maximumSpeed - minimumSpeed) * (finalAngle / accelDist)
             elif finalAngle > degree - deccelDist:
-                speed = minimumSpeed + (maximumSpeed - minimumSpeed) * ((degree - finalAngle) / deccelDist/4)
+                speed = minimumSpeed + (maximumSpeed - minimumSpeed) * ((degree - finalAngle) / deccelDist / 20)
             else: 
                 speed = maximumSpeed
             if move:
@@ -108,25 +109,32 @@ class Movement:
                                 CheckLimit.minimaximum(rightspeed, minimumSpeed, 1500))
         self.basic.stop()
 
-    def gyrodegree(self, speed, degree, minimumSpeed=20, maximumSpeed=1500, override=None):
+    def gyrodegree(self, speed, degree, minimumSpeed=20, maximumSpeed=1500, override=None, decel=True, stop=True):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         if override != None:
             currentDegree = override
-        output = [0, 1000, 0, 0]
+        output = [0, 0, 0, 0]
         while True:
-            pidDistance = self.decelerate(
-                degree, minimumSpeed=minimumSpeed, maximumSpeed=maximumSpeed, move=False, currentAngle=currentAngle)
+            if decel == True:
+                pidDistance = self.decelerate(degree, minimumSpeed=minimumSpeed, maximumSpeed=maximumSpeed, move=False, currentAngle=currentAngle)
+            else:
+                finalAngle = abs(self.motorb.angle()-currentAngle)
+                degrees = abs(degree)
+                if finalAngle < degrees:
+                    pidDistance = abs(speed)
+                else: 
+                    pidDistance = None
             if pidDistance == None:
                 break
-            output = self.gyro(speed=900, minimumSpeed=minimumSpeed, inputs=[
-                               output[0], output[1], currentDegree], override=override)
+            output = self.gyro(speed=abs(speed)*3, minimumSpeed=minimumSpeed, inputs=[output[0], output[1], currentDegree], override=override)
             left = CheckLimit.minimaximum(output[2]*0.8+pidDistance*0.4, minimumSpeed, 1500)
             right = CheckLimit.minimaximum(output[3]*0.8+pidDistance*0.4, minimumSpeed, 1500)
             self.basic.move(left, right) if degree > 0 else self.basic.move(-right, -left)
-        self.basic.stop()
+        if stop:
+            self.basic.stop()
 
-    def gyroTillSense(self, speed, condition, minimumSpeed=20, stopAfter=None, override=None):
+    def gyroTillSense(self, speed, condition, minimumSpeed=20, stopAfter=None, override=None, stop=True):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         outputs = [0, 0]
@@ -135,11 +143,10 @@ class Movement:
         while True:
             output = self.gyro(speed=speed, minimumSpeed=minimumSpeed, inputs=[
                 outputs[0], outputs[1], currentDegree], override=override)
-            print(output)
             self.basic.move(output[2], output[3])
             if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
-                self.basic.stop()                
-                self.basic.beep()  
+                if stop:
+                    self.basic.stop() 
                 return None
         return
 
