@@ -29,10 +29,9 @@ class Robot:
             "blue_floor": Colour("blue_floor", lambda: (basic.sense(1)[0] < 15 and basic.sense(1)[1] < 30 and basic.sense(1)[2] > 40)),
             "green_floor": Colour("green_floor", lambda: (basic.sense(1)[0] < 15 and basic.sense(1)[1] > 30 and basic.sense(1)[2] < 20)),
             
-            # "chemical": Colour("chemical", lambda val: val[2] > 10 and sum(val) > 30 and val[0] - val[1] <= 7 and val[0] - val[1] >= -7 and val[1] - val[2] <= 7 and val[1] - val[2] >= -7),
-            "chemical": Colour("chemical", lambda val: val[0] > 11 and val[0] < 19 and val[1] > 18 and val[1] < 24 and val[2] > 12 and val[2] < 18 and val[3] > 44 and val[3] < 48),
-            "fire": Colour("fire", lambda val: val[0] >= 50 and val[1] <= 50 and val[2] <= 50),
-            "human": Colour("human", lambda val: sum(val) > 250),
+            "chemical": Colour("chemical", lambda val: self.betw(val[0], 11, 19) and self.betw(val[1], 18, 24) and self.betw(val[2], 12, 18) and self.betw(val[3], 44, 48)),
+            "fire": Colour("fire", lambda val: self.betw(val[0], 27, 34) and self.betw(val[1], 17, 23) and self.betw(val[2], 3, 6) and self.betw(val[3], 40, 46)),
+            "human": Colour("human", lambda val, val2: sum(val2) > 150 and self.betw(val[0], 17, 20) and self.betw(val[1], 17, 20) and self.betw(val[2], 17, 20) and self.betw(val[3], 45, 49)),
             "line_tracking": 37
         }
         self.movement = Movement(ev3, motor, sensor, self.basic)
@@ -50,6 +49,11 @@ class Robot:
         elif int(self.startingPos) == -1:
             return left
 
+    def betw(self, value, small, large):
+        if value >= small and value <= large:
+            return True
+        else: 
+            return False
     
 
 class Colour:

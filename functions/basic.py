@@ -22,6 +22,7 @@ class Basic:
         self.ev3.speaker.beep()
     
     def resetRobot(self):
+        self.motord.run_target(1500, 0)
         self.motorb.reset_angle(0)
         self.motorc.reset_angle(0)
         self.motord.reset_angle(0)
@@ -35,7 +36,9 @@ class Basic:
             return sensors[sensorNo].angle()
         elif sensorNo == 1:
             return sensors[sensorNo].rgb()
-        else:
+        elif sensorNo == 4 or sensorNo == 5:
+            return sensors[(sensorNo-2)].read("RGB")
+        elif sensorNo == 2 or sensorNo == 3:
             rgb = sensors[sensorNo].read("RGB")
             if sum(rgb) == 0:
                 return [0, 0, 0, 0]

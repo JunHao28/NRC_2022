@@ -16,7 +16,7 @@ class Tasks:
         self.movement = movement
         self.wait = wait
 
-    def checkColour(self, rgbValue, direction, box, moveForward=False, special=0):
+    def checkColour(self, rgbValue, rgbValue2, direction, box, moveForward=False, special=0):
         # Direction: Left 1, Right 2
         # Box: Red 1, Brown 2, Yellow 3, White 4, Green 5, Blue 6
         # Special (Got wall for collecting chemical)
@@ -30,7 +30,8 @@ class Tasks:
             self.basic.stop()
             self.depositWater()
             return True
-        elif self.colour["human"].condition(rgbValue):
+        elif self.colour["human"].condition(rgbValue, rgbValue2):
+            self.basic.beep()
             if self.human[0] == 0:
                 self.human[0] = box
                 return True
