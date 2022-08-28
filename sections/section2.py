@@ -44,8 +44,6 @@ def section2(robot):
         robot.movement.gyroTillSense(-200, lambda: robot.tasks.checkColour(robot.basic.sense(2),robot.basic.sense(4), 2, 5, special=1), stopAfter=-100, override=robot.neg(180), stop=False)
         robot.movement.gyrodegree(100, -260 - (robot.motorb.angle() - angleAtDetectGreen), startingSpeed=150, maximumSpeedAccel=150, minimumSpeed=80, decelDist=10, times=False)
     robot.movement.turn(0, robot.basic.sense(0) - 270, oneWheel=robot.side(2, 0))
-    robot.basic.move(700, 700)
-    robot.pause(1)
-    robot.basic.stop()
+    robot.moveTillStall(1500)
     
     return robot

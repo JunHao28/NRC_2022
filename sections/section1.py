@@ -26,7 +26,5 @@ def section1(robot):
     robot.movement.gyrodegree(300, 100)
     robot.pause(0.5)
     robot.movement.turn(0, int(robot.startingPos) * 90 - robot.basic.sense(0))
-    robot.basic.move(1500, 1500)
-    robot.pause(0.8)
-    robot.basic.stop()
+    robot.moveTillStall(1500)
     return robot

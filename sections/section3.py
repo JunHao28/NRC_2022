@@ -38,8 +38,6 @@ def section3(robot):
     robot.movement.gyrodegree(-50, -200 - (robot.motorb.angle() - angleAtDetectRed))
     robot.movement.turn(0, 0 - robot.basic.sense(0), oneWheel=robot.side(2, 0))
     robot.movement.gyrodegree(200, 200)
-    robot.basic.move(300, 300)
-    robot.pause(1)
-    robot.basic.stop()
+    robot.moveTillStall(1500)
 
     return robot

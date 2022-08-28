@@ -101,10 +101,6 @@ def section6(robot):
     robot.basic.stop()
     robot.pause(0.2)
     robot.sensor1.reset_angle(-180)
-    robot.movement.turn(0, -75, oneWheel=2)
-    robot.basic.move(700, 700)
-    robot.pause(1)
-    robot.basic.stop()
-
-
+    robot.movement.turn(0, -80, oneWheel=2)
+    robot.moveTillStall(1500)
     return robot

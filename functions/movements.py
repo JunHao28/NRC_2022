@@ -65,6 +65,21 @@ class Movement:
                 left = result[0] if (oneWheel != 2) else 0
                 self.basic.move(left, right)
 
+    def moveTillStall(self, speed):
+        motorb = []
+        motorc = []
+        while True:
+            motorb.append(self.motorb.angle())
+            motorc.append(self.motorc.angle())
+            if len(motorb) > 4:
+                motorb.pop(0)
+                motorc.pop(0)
+                if len(set(motorb)) == 1 and len(set(motorc)) == 1:
+                    self.basic.stop()
+                    return
+            self.basic.move(speed, speed)
+
+
     def decelerate(self, degree, startingSpeed=0, accelDist=40, deccelDist=200, maximumSpeed=1300, minimumSpeed=20, move=True, currentAngle=0):
         if move:
             currentAngle = self.motorb.angle()

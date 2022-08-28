@@ -24,15 +24,12 @@ def section5(robot):
     robot.movement.gyrodegree(-300, -100, override=0)
     robot.movement.turn(0, -90, oneWheel=1)
     robot.movement.gyrodegree(300, 400)
-    robot.basic.move(1500, 1500)
-    robot.pause(1)
-    robot.basic.stop()
+    robot.moveTillStall(1500)
     robot.sensor1.reset_angle(-90)
     robot.movement.gyrodegree(-200, -10)
     robot.movement.turn(0, -90, oneWheel=2)
     robot.movement.gyrodegree(400, 800)
     
     robot.movement.turn(0, -90-robot.basic.sense(0), oneWheel=2)
-    robot.basic.move(700, 700)
-    robot.pause(1)
+    robot.moveTillStall(1500)
     return robot

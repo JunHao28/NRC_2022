@@ -44,8 +44,6 @@ def section4(robot):
     robot.movement.gyrodegree(200, 320, decelDist=300)
     robot.pause(0.5)
     robot.movement.turn(0, -90, oneWheel=2)
-    robot.basic.move(600, 600)
-    robot.pause(1)
-    robot.basic.stop()
+    robot.moveTillStall(1500)
 
     return robot
