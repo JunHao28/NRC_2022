@@ -14,6 +14,8 @@ from sections.section1 import section1
 from sections.section2 import section2
 from sections.section3 import section3
 from sections.section4 import section4
+from sections.section5 import section5
+from sections.section6 import section6
 from functions.unchanged.StartingPos import StartingPos
 
 # Documentation:
@@ -37,12 +39,32 @@ robot = Robot(ev3, [motorb, motorc, motord], [gyro, sensor1, sensor2, sensor3], 
 #NOTE: reset arm position
 robot.basic.resetRobot()
 robot.startingPos = StartingPos.RIGHT
-# robot = section1(robot)
+robot = section1(robot)
 robot = section2(robot)
 robot = section3(robot)
 robot = section4(robot)
-# sensors = [robot.sensor1, robot.sensor2, robot.sensor3, robot.sensor4]
-# print(Ev3devSensor(Port.S3).read("RGB"))
+robot = section5(robot)
+robot = section6(robot)
+# robot.tasks.depositWater()
+# count=0
+# while True:
+#     count += 1
+# rgbValue = robot.basic.sense(2)
+# rgbValue2= robot.basic.sense(4)
+# print(rgbValue)
+# print(rgbValue2)
+#     # print(count)
+#     if robot.colour["chemical"].condition(rgbValue, rgbValue2):
+#         print("Chemical", rgbValue, rgbValue2)
+#     elif robot.colour["human"].condition(rgbValue, rgbValue2):
+#         print("Human", rgbValue, rgbValue2)
+#     else:
+#         print("Nothing", rgbValue, rgbValue2)
+# robot.movement.turn(0, 90, oneWheel=1) 
+robot.basic.beep()
+robot.motord.run_target(1500, 0)
+
+# print(robot.basic.sense(1))
 robot.basic.stop()
 wait(1000)
 print((stopwatch.time()/1000)-1)

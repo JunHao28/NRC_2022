@@ -23,6 +23,7 @@ def section1(robot):
         robot.movement.turn(0, -85, oneWheel=1)
     robot.movement.gyrodegree(400, 700, override=0)
     robot.movement.gyroTillSense(300, lambda: robot.basic.check(1, 250), override=0)
+    robot.movement.gyrodegree(300, 100)
     robot.pause(0.5)
     robot.movement.turn(0, int(robot.startingPos) * 90 - robot.basic.sense(0))
     robot.basic.move(1500, 1500)

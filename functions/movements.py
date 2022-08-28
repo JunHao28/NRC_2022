@@ -11,10 +11,11 @@ class Movement:
 
     # PID values
     # gyros = PID(90, 0, 10)
-    gyros = PID(20, 0, 5)
-    oneWheelTurn = PID(15, 0.00000003, 8)
-    twoWheelTurn = PID(7.5, 0.000000028, 4)
+    gyros = PID(20, 0, 3)
+    oneWheelTurn = PID(14.2, 0.0015, 8)
+    twoWheelTurn = PID(8, 0.001, 5)
     track = PID(1.3, 0, 5)
+    track2 = PID(2.3, 0, 10)
 
     # forwardki = 0.0001
     # forwardkp = 5
@@ -64,7 +65,7 @@ class Movement:
                 left = result[0] if (oneWheel != 2) else 0
                 self.basic.move(left, right)
 
-    def decelerate(self, degree, accelDist=40, deccelDist=250, maximumSpeed=1300, minimumSpeed=20, move=True, currentAngle=0):
+    def decelerate(self, degree, startingSpeed=0, accelDist=40, deccelDist=200, maximumSpeed=1300, minimumSpeed=20, move=True, currentAngle=0):
         if move:
             currentAngle = self.motorb.angle()
             result = [0, 0, 1000]
@@ -72,9 +73,11 @@ class Movement:
         degree = abs(degree)
         while finalAngle < degree:
             if finalAngle < accelDist:
-                speed = minimumSpeed + (maximumSpeed - minimumSpeed) * (finalAngle / accelDist)
-            elif finalAngle > degree - deccelDist:
+                speed = startingSpeed + (maximumSpeed - startingSpeed) * (finalAngle / accelDist)
+            elif finalAngle >= degree - deccelDist-50:
                 speed = minimumSpeed + (maximumSpeed - minimumSpeed) * ((degree - finalAngle) / deccelDist / 20)
+            elif finalAngle <= 50:
+                speed=minimumSpeed
             else: 
                 speed = maximumSpeed
             if move:
@@ -109,7 +112,7 @@ class Movement:
                                 CheckLimit.minimaximum(rightspeed, minimumSpeed, 1500))
         self.basic.stop()
 
-    def gyrodegree(self, speed, degree, minimumSpeed=20, maximumSpeed=1500, override=None, decel=True, stop=True):
+    def gyrodegree(self, speed, degree, minimumSpeed=20, maximumSpeed=1500, override=None, decel=True, stop=True, times=True, decelDist=250, maximumSpeedAccel=1300, startingSpeed=0):
         currentAngle = self.motorb.angle()
         currentDegree = self.sensor1.angle()
         if override != None:
@@ -117,7 +120,7 @@ class Movement:
         output = [0, 0, 0, 0]
         while True:
             if decel == True:
-                pidDistance = self.decelerate(degree, minimumSpeed=minimumSpeed, maximumSpeed=maximumSpeed, move=False, currentAngle=currentAngle)
+                pidDistance = self.decelerate(degree, minimumSpeed=minimumSpeed, maximumSpeed=maximumSpeedAccel, move=False, currentAngle=currentAngle, deccelDist=decelDist, startingSpeed=startingSpeed)
             else:
                 finalAngle = abs(self.motorb.angle()-currentAngle)
                 degrees = abs(degree)
@@ -127,7 +130,7 @@ class Movement:
                     pidDistance = None
             if pidDistance == None:
                 break
-            output = self.gyro(speed=abs(speed)*3, minimumSpeed=minimumSpeed, inputs=[output[0], output[1], currentDegree], override=override)
+            output = self.gyro(speed=abs(speed)* (3 if times else 1), minimumSpeed=minimumSpeed, inputs=[output[0], output[1], currentDegree], override=override)
             left = CheckLimit.minimaximum(output[2]*0.8+pidDistance*0.4, minimumSpeed, 1500)
             right = CheckLimit.minimaximum(output[3]*0.8+pidDistance*0.4, minimumSpeed, 1500)
             self.basic.move(left, right) if degree > 0 else self.basic.move(-right, -left)
@@ -141,22 +144,27 @@ class Movement:
         if override != None:
             currentDegree = override
         while True:
+            # print(self.sensor1.angle())
             output = self.gyro(speed=speed, minimumSpeed=minimumSpeed, inputs=[
                 outputs[0], outputs[1], currentDegree], override=override)
             self.basic.move(output[2], output[3])
-            if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
+            if condition():
                 if stop:
                     self.basic.stop() 
-                return None
+                return True
+            elif (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
+                if stop:
+                    self.basic.stop() 
+                return
         return
 
-    def pidLineTracking(self, rgb, speed, returnVal=None, condition=lambda: True):
+    def pidLineTracking(self, rgb, speed, returnVal=None, condition=lambda: True, pid=None):
         result = [0, 0, 0]
         if returnVal != None:
             result = returnVal
         while condition():
             error = self.sensor2.reflection() - rgb
-            result = self.track.pid(error, result[1], result[2], change=1)
+            result = pid.pid(error, result[1], result[2], change=1)
             change = CheckLimit.maximum(result[0], 1500-speed)
             if returnVal == None:
                 self.basic.move(-speed - change, - speed + change)
@@ -164,10 +172,13 @@ class Movement:
                 return [-speed - change, - speed + change, result[1], result[2]]
         self.basic.stop()
 
-    def lineTrackingTillSense(self, rgb, speed, condition, stopAfter=None, whiteblack=True):
+    def lineTrackingTillSense(self, rgb, speed, condition, stopAfter=None, whiteblack=True, pid=None):
+        if pid == None:
+            pid = self.track
         returnVal = [0, 0, 0, 0]
+        currentAngle = self.motorb.angle()
         while True:
-            returnVal = self.pidLineTracking(rgb, speed, returnVal=[0, returnVal[2], returnVal[3]])
+            returnVal = self.pidLineTracking(rgb, speed, returnVal=[0, returnVal[2], returnVal[3]], pid=pid)
             self.basic.move(returnVal[0 if whiteblack else 1], returnVal[1 if whiteblack else 0])
             if condition() or (stopAfter != None and (abs(stopAfter) <= abs(self.motorb.angle()-currentAngle))):
                 self.basic.stop()
