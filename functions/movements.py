@@ -71,7 +71,7 @@ class Movement:
         while True:
             motorb.append(self.motorb.angle())
             motorc.append(self.motorc.angle())
-            if len(motorb) > 4:
+            if len(motorb) > 10 and len(motorc) > 10:
                 motorb.pop(0)
                 motorc.pop(0)
                 if len(set(motorb)) == 1 and len(set(motorc)) == 1:

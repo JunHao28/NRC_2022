@@ -1,7 +1,8 @@
 from functions.robot import Robot
 
 def section6(robot):
-
+    if robot == None:
+        return robot
     
     # robot.human = [1,2]
     arrangeList=[2, 1, 4, 3, 6, 5]
@@ -13,9 +14,7 @@ def section6(robot):
 
     robot.sensor1.reset_angle(-90)
     robot.movement.turn(0, -180 - robot.basic.sense(0), oneWheel=2)
-    robot.basic.move(700, 700)
-    robot.pause(1)
-    robot.basic.stop()
+    robot.movement.moveTillStall(1500)
     robot.pause(0.2)
     robot.sensor1.reset_angle(-180)
     robot.tasks.depositYellow()
@@ -102,5 +101,5 @@ def section6(robot):
     robot.pause(0.2)
     robot.sensor1.reset_angle(-180)
     robot.movement.turn(0, -80, oneWheel=2)
-    robot.moveTillStall(1500)
+    robot.movement.moveTillStall(1500)
     return robot

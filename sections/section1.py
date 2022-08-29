@@ -14,17 +14,16 @@ def section1(robot):
         robot.startingPos = StartingPos.RIGHT
         # 1
 
-    robot.movement.gyrodegree(500, robot.side(250, 100), maximumSpeed=500)
-    robot.basic.beep()
+    robot.movement.gyrodegree(400, robot.side(170, 100), maximumSpeed=700, override=0, minimumSpeed=400, deccelDist=130)
     if (robot.startingPos == StartingPos.RIGHT):
-        robot.movement.turn(0, -12, oneWheel=2)
+        robot.motorb.run_angle(400, 100)
     else:
         robot.movement.turn(0, 85, oneWheel=2)
         robot.movement.turn(0, -85, oneWheel=1)
-    robot.movement.gyrodegree(400, 700, override=0)
+    robot.movement.gyrodegree(600, 700, override=0)
     robot.movement.gyroTillSense(300, lambda: robot.basic.check(1, 250), override=0)
     robot.movement.gyrodegree(300, 100)
     robot.pause(0.5)
     robot.movement.turn(0, int(robot.startingPos) * 90 - robot.basic.sense(0))
-    robot.moveTillStall(1500)
+    robot.movement.moveTillStall(1500)
     return robot

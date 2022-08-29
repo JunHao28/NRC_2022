@@ -35,15 +35,16 @@ def section4(robot):
     robot.movement.gyroTillSense(-150, lambda: robot.colour["brown_floor"].condition(), override=0, stop=False)
     robot.movement.gyrodegree(-200, -170, decel=False, stop=False, override=0)
 
-    robot.movement.gyroTillSense(-200, lambda: robot.tasks.checkColour(robot.basic.sense(3), robot.basic.sense(5), 2, 2, special=2), stopAfter=-80, override=0, stop=False)
+    robot.movement.gyroTillSense(-200, lambda: robot.tasks.checkColour(2, 2, special=2), stopAfter=-80, override=0, stop=False)
+    robot.tasks.lastSense = [0, 0, 0, 0]
     robot.movement.gyrodegree(-200, -250, decel=True, minimumSpeed=80, stop=False, override=0)
     robot.movement.gyroTillSense(-80, lambda: (robot.colour["brown_floor"].condition() != True), override=0, stop=False)
     robot.movement.lineTrackingTillSense(robot.colour["line_tracking"], 200, lambda: robot.tasks.checkColour(robot.basic.sense(3), robot.basic.sense(5), 2, 2, ), stopAfter=-150, whiteblack=False)
 
     robot.movement.gyroTillSense(150, lambda: robot.colour["brown_floor"].condition(), override=0, stop=False)
-    robot.movement.gyrodegree(200, 320, decelDist=300)
+    robot.movement.gyrodegree(200, 320, deccelDist=300)
     robot.pause(0.5)
     robot.movement.turn(0, -90, oneWheel=2)
-    robot.moveTillStall(1500)
+    robot.movement.moveTillStall(1500)
 
     return robot

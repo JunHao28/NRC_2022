@@ -39,7 +39,7 @@ robot = Robot(ev3, [motorb, motorc, motord], [gyro, sensor1, sensor2, sensor3], 
 #NOTE: reset arm position
 robot.basic.resetRobot()
 robot.startingPos = StartingPos.RIGHT
-robot = section1(robot)
+# robot = section1(robot)
 robot = section2(robot)
 robot = section3(robot)
 robot = section4(robot)

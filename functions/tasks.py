@@ -17,34 +17,30 @@ class Tasks:
         self.wait = wait
         self.lastSense = [0, 0, 0, 0]
 
-    def checkColour(self, rgbValue, rgbValue2, direction, box, moveForward=False, special=0):
+    def checkColour(self, side, box, moveForward=False, special=0):
         # Direction: Left 1, Right 2
         # Box: Red 1, Brown 2, Yellow 3, White 4, Green 5, Blue 6
         # Special (Got wall for collecting chemical)
+        rgbValue = self.basic.sense(side)
+        rgbValue2 = self.basic.sense(side+2)
         if self.lastSense == [0, 0, 0, 0]:
             self.lastSense = rgbValue2
             return False
         else:
-            # print(self.lastSense)
-            # print(rgbValue)
-            # print(rgbValue2)
             for x in range(len(self.lastSense)):
-                if abs(self.lastSense[x] - rgbValue2[x]) >= 4:
+                if (self.lastSense[x] - rgbValue2[x]) >= 15 or abs(sum(self.lastSense) - sum(rgbValue2)) >= 13:
                     self.basic.stop()
-                    self.movement.gyrodegree(10, -2)
-                    # print("yes")
                     self.lastSense = rgbValue2
                     break
                 if x == 3:
                     self.lastSense = rgbValue2
                     return False 
         
+        self.movement.gyroTillSense(100, lambda: abs(sum(self.basic.sense(side+2)) - sum(rgbValue2)) > 10, stopAfter=10)
             
         if self.colour["chemical"].condition(rgbValue, rgbValue2):
-            print(rgbValue)
-            print(rgbValue2)
             self.basic.stop()
-            self.collectChemical(direction, special=special)
+            self.collectChemical(2 if side=2 else 1, special=special)
             self.lastSense = [0, 0, 0, 0]
             return True
         elif self.colour["fire"].condition(rgbValue):
@@ -54,6 +50,7 @@ class Tasks:
             self.lastSense = [0, 0, 0, 0]
             return True
         elif self.colour["human"].condition(rgbValue, rgbValue2):
+            self.ev3.speaker.beep(frequency=800)
             self.basic.beep()
             if self.human[0] == 0:
                 self.human[0] = box
@@ -65,9 +62,8 @@ class Tasks:
             return False
 
     def depositWater(self):
-        self.run_until_stalled(-1500, )
+        self.motord.run_until_stalled(-1500, )
         self.motord.stop()
-        # self.motord.run(500)
         self.motord.run_target(1500, 0 if self.chemical == False else -250)
 
     def collectYellow(self):

@@ -30,7 +30,7 @@ class Robot:
             "green_floor": Colour("green_floor", lambda: (basic.sense(1)[0] < 15 and basic.sense(1)[1] > 30 and basic.sense(1)[2] < 20)),
             "white_floor": Colour("white_floor", lambda: (sum(basic.sense(1)) > 200)),
             
-            "chemical": Colour("chemical", lambda val, val2: sum(val2) > 90 and sum(val2) < 120 and self.betw(val[0], 15, 20) and self.betw(val[1], 15, 20) and self.betw(val[2], 15, 20) and self.betw(val[3], 45, 49)),
+            "chemical": Colour("chemical", lambda val, val2: sum(val2) > 95 and sum(val2) < 140 and self.betw(val[0], 15, 20) and self.betw(val[1], 15, 20) and self.betw(val[2], 15, 20) and self.betw(val[3], 45, 49)),
             "fire": Colour("fire", lambda val: self.betw(val[0], 32, 47) and self.betw(val[1], 10, 15) and self.betw(val[2], 0, 14) and self.betw(val[3], 41, 48)),
             "human": Colour("human", lambda val, val2: sum(val2) > 300 and self.betw(val[0], 15, 28) and self.betw(val[1], 15, 28) and self.betw(val[2], 14, 28) and self.betw(val[3], 25, 45)),
             "line_tracking": 37,
