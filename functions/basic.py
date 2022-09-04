@@ -36,6 +36,8 @@ class Basic:
             return sensors[sensorNo].angle()
         elif sensorNo == 1:
             return sensors[sensorNo].rgb()
+        elif sensorNo == 6:
+            return sensors[1].reflection()
         elif sensorNo == 4 or sensorNo == 5:
             return sensors[(sensorNo-2)].read("RGB")
         elif sensorNo == 2 or sensorNo == 3:
