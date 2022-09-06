@@ -9,10 +9,10 @@ def section5(robot):
     arrangeList=robot.side([2, 1, 4, 3, 6, 5], [6, 5, 4, 3, 2, 1])
 
     human = []
-    if human[0] == 0:
-        human[0] = randint(1, 6)
-    if human[1] == 0:
-        human[1] = randint(1, 6)
+    # if human[0] == 0:
+    #     human[0] = randint(1, 6)
+    if robot.human[1] == 0:
+        robot.human[1] = 4
     human.append(arrangeList.index(robot.human[0]))
     human.append(arrangeList.index(robot.human[1]))
     human.sort()
@@ -26,7 +26,7 @@ def section5(robot):
     robot.movement.moveTillStall(1000)
     robot.sensor1.reset_angle(-180)
     robot.tasks.depositYellow()
-    robot.movement.gyrodegree(-300, -90, decel=False, override=-180)
+    robot.movement.gyrodegree(-300, -95, decel=False, override=-180)
     robot.movement.turn(0, -90 - robot.basic.sense(0), oneWheel=1)
     robot.movement.gyroTillSense(-100, lambda: robot.sensor2.reflection() > 30)
     robot.tasks.collectYellow()
@@ -34,7 +34,7 @@ def section5(robot):
         robot.movement.turn(0, 90, oneWheel=1)
         robot.movement.gyrodegree(-10, -80, decel=False, times=False)
         robot.tasks.depositYellow()
-        robot.movement.gyrodegree(10, 60, decel=False, times=False)
+        robot.movement.gyrodegree(10, 70, decel=False, times=False)
         robot.movement.turn(0, -90, oneWheel=1)
         robot.movement.gyrodegree(-80, -100)
     elif human[0] == 1: #Red, Green
@@ -100,7 +100,9 @@ def section5(robot):
     robot.movement.moveTillStall(700)
     robot.pause(0.2)
     robot.sensor1.reset_angle(-180)
-    robot.movement.turn(0, -80, oneWheel=2)
+    
+    robot.motord.run_angle(1500, -300)
+    robot.movement.turn(0, -75, oneWheel=2)
     robot.movement.moveTillStall(1000)
     return robot
 

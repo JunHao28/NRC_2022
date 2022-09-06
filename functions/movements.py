@@ -9,13 +9,13 @@ class Movement:
 
     #PID values
     gyros = PID(83, 0, 0)
-    gyro2 = PID(10, 0, 5)
+    gyro2 = PID(13.5, 0, 1.6)
     oneWheelTurn = PID(0.95, 0.01, 0)
     twoWheelTurn = PID(0.16, 0.00898, 0)
     track = PID(1.3, 0, 5)
     track2 = PID(3, 0, 10)
 
-    def __init__(self, ev3, motor, sensor, basic):
+    def __init__(self, ev3, motor, sensor, basic, printtxt):
         self.ev3 = ev3
         self.motorb = motor[0]
         self.motorc = motor[1]
@@ -25,6 +25,7 @@ class Movement:
         self.sensor3 = sensor[2]
         self.sensor4 = sensor[3]
         self.basic = basic
+        self.print = printtxt
 
     def turn(self, speed, degree, oneWheel=0):
         # C wheel turn: 1
@@ -33,13 +34,13 @@ class Movement:
         errors = []
         result = [0, 0, 0]
         if oneWheel == 0:
-            minimumSpeed=30
+            minimumSpeed=36
             maximumSpeed=700
-            decelDeg=64
+            decelDeg=65
         else:
-            minimumSpeed=55
+            minimumSpeed=70
             maximumSpeed=1500
-            decelDeg=70
+            decelDeg=71
         while True:
             error = self.basic.sense(0) - (currentAngle + degree)
             errors.append(error)
@@ -56,7 +57,6 @@ class Movement:
                     result[1] *= -1
                 if error > 0 and result[1] < 0:
                     result[1] *= -1
-
                 if abs(error) >= decelDeg:
                     speed = maximumSpeed
                 else:
@@ -105,7 +105,7 @@ class Movement:
         self.basic.stop()
         return None
 
-    def gyro(self, pid, speed=700, condition=None, minimumSpeed=0, override=None, inputs=None):
+    def gyro(self, pid, speed=700, condition=None, minimumSpeed=0, override=None, inputs=None, cap=None):
         outputs = [0, 0, 0]
         if inputs == None:
             currentDegree = self.sensor1.angle()
@@ -118,6 +118,8 @@ class Movement:
         while True:
             gyroError = self.sensor1.angle() - currentDegree
             outputs = pid.pid(gyroError, outputs[1], outputs[2])
+            if cap != None:
+                outputs[0] = CheckLimit.minimaximum(outputs[0], 0, cap)
             rightspeed = (speed - outputs[0]) if (speed > 0) else speed - outputs[0]
             leftspeed = speed + outputs[0] if(speed > 0) else speed + outputs[0]
             if condition != None and condition():
@@ -163,9 +165,8 @@ class Movement:
         if override != None:
             currentDegree = override
         while True:
-            # print(self.sensor1.angle())
-            output = self.gyro(self.gyro2, speed=speed, minimumSpeed=minimumSpeed, inputs=[outputs[0], outputs[1], currentDegree], override=override)
-            self.basic.move(output[2], output[3])
+            output = self.gyro(self.gyro2, speed=speed, minimumSpeed=minimumSpeed, inputs=[outputs[0], outputs[1], currentDegree], override=override, cap=100)
+            
             if condition():
                 if stop:
                     self.basic.stop() 
@@ -174,6 +175,7 @@ class Movement:
                 if stop:
                     self.basic.stop() 
                 return 
+            self.basic.move(output[2], output[3])
         return
 
     def pidLineTracking(self, rgb, speed, returnVal=None, condition=lambda: True, pid=None):
